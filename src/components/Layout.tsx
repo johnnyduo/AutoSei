@@ -3,10 +3,13 @@
 import { ReactNode, useState } from 'react';
 import DashboardHeader from './DashboardHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, MessageCircle, Settings, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, MessageCircle, Settings, BarChart2, Bot } from 'lucide-react';
 import AIChat from './AIChat';
 import AllocationAdjuster from './AllocationAdjuster';
 import WhaleTracker from './WhaleTracker';
+import TradingBotsDashboard from './TradingBotsDashboard';
+import StrategiesMarketplace from './StrategiesMarketplace';
+import OnboardingWelcome from './OnboardingWelcome';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
@@ -15,6 +18,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const isMobile = useIsMobile();
   
   return (
@@ -24,7 +28,7 @@ const Layout = ({ children }: LayoutProps) => {
       <main className="flex-1 container mx-auto py-4 md:py-6 px-2 md:px-4 pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-4 md:mb-8 overflow-x-auto">
-            <TabsList className="bg-cosmic-800/50 p-1 rounded-xl shadow-lg border border-cosmic-700">
+            <TabsList className="glass-panel p-1 rounded-xl">
               <TabsTrigger 
                 value="dashboard" 
                 className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
@@ -34,11 +38,19 @@ const Layout = ({ children }: LayoutProps) => {
               </TabsTrigger>
               
               <TabsTrigger 
-                value="whales" 
+                value="bots" 
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              >
+                <Bot className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="text-xs md:text-sm">Trading Bots</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="strategies" 
                 className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <BarChart2 className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Whale Tracker</span>
+                <span className="text-xs md:text-sm">Strategies</span>
               </TabsTrigger>
               
               <TabsTrigger 
@@ -63,8 +75,12 @@ const Layout = ({ children }: LayoutProps) => {
             {children}
           </TabsContent>
           
-          <TabsContent value="whales" className="mt-0 outline-none">
-            <WhaleTracker />
+          <TabsContent value="bots" className="mt-0 outline-none">
+            <TradingBotsDashboard />
+          </TabsContent>
+          
+          <TabsContent value="strategies" className="mt-0 outline-none">
+            <StrategiesMarketplace />
           </TabsContent>
           
           <TabsContent value="chat" className="mt-0 outline-none">
@@ -80,6 +96,10 @@ const Layout = ({ children }: LayoutProps) => {
           </TabsContent>
         </Tabs>
       </main>
+      
+      {showOnboarding && (
+        <OnboardingWelcome onComplete={() => setShowOnboarding(false)} />
+      )}
     </div>
   );
 };
