@@ -1,25 +1,25 @@
 // src/lib/chains.ts
-export const iotaTestnet = {
-  id: 1075,
-  name: 'IOTA EVM Testnet',
-  network: 'iota-testnet',
+export const seiTestnet = {
+  id: 1328,
+  name: 'Sei EVM Testnet',
+  network: 'sei-testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'IOTA',
-    symbol: 'MIOTA',
+    name: 'SEI',
+    symbol: 'SEI',
   },
   rpcUrls: {
     default: {
-      http: ['https://json-rpc.evm.testnet.iotaledger.net'],
+      http: ['https://evm-rpc-testnet.sei-apis.com'],
     },
     public: {
-      http: ['https://json-rpc.evm.testnet.iotaledger.net'],
+      http: ['https://evm-rpc-testnet.sei-apis.com'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Explorer',
-      url: 'https://explorer.evm.testnet.iotaledger.net',
+      name: 'SeiTrace',
+      url: 'https://seitrace.com/?chain=atlantic-2',
     },
   },
 };

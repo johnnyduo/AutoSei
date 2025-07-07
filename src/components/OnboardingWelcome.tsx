@@ -37,8 +37,8 @@ const OnboardingWelcome: React.FC<{ onComplete: () => void }> = ({ onComplete })
   const steps: OnboardingStep[] = [
     {
       id: 'welcome',
-      title: 'Welcome to AToIoTA',
-      description: 'Your AI-powered DeFi investment portfolio navigator for the IOTA EVM network',
+      title: 'Welcome to AutoSei',
+      description: 'Your AI-powered DeFi investment portfolio navigator for the Sei EVM network',
       icon: Rocket,
       completed: false,
       action: 'Get Started'
@@ -141,9 +141,9 @@ const OnboardingWelcome: React.FC<{ onComplete: () => void }> = ({ onComplete })
             <div className="inline-flex items-center justify-center w-20 h-20 mb-4 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse-glow">
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold cosmic-text mb-2">Welcome to AToIoTA</h1>
+            <h1 className="text-4xl font-bold cosmic-text mb-2">Welcome to AutoSei</h1>
             <p className="text-lg text-muted-foreground">
-              AI-powered DeFi investment portfolio navigator for IOTA EVM
+              AI-powered DeFi investment portfolio navigator for Sei EVM
             </p>
           </div>
 
@@ -217,7 +217,7 @@ const OnboardingWelcome: React.FC<{ onComplete: () => void }> = ({ onComplete })
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
                   <Globe className="w-8 h-8 text-secondary" />
                 </div>
-                <h3 className="font-semibold mb-2">Connect to IOTA EVM Network</h3>
+                <h3 className="font-semibold mb-2">Connect to Sei EVM Network</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Connect your wallet to access DeFi features, manage your portfolio, and deploy trading strategies.
                 </p>

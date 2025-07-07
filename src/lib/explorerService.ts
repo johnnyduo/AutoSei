@@ -1,8 +1,9 @@
 // src/lib/explorerService.ts
 import axios from 'axios';
 
-// Use the mainnet explorer API v2
-const EXPLORER_API_URL = 'https://explorer.evm.iota.org/api/v2';
+// Use the Sei explorer API (SeiTrace)
+const EXPLORER_API_URL = 'https://seitrace.com/api/v2';
+const SEI_EXPLORER_API_KEY = import.meta.env.VITE_SEI_EXPLORER_API_KEY;
 
 export interface TokenTransfer {
   hash: string;
@@ -342,15 +343,8 @@ function calculateMockUsdValue(amount: string, symbol: string): string {
   
   // Mock prices
   switch (symbol) {
-    case 'MIOTA':
-    case 'IOTA':
-      price = 0.18;
-      break;
-    case 'SMR':
-      price = 0.03;
-      break;
-    case 'ASMB':
-      price = 0.05;
+    case 'SEI':
+      price = 0.45;
       break;
     case 'USDT':
     case 'USDC':
@@ -391,8 +385,8 @@ function getMockTopTokens(): Token[] {
   return [
     {
       address: '0x1234567890123456789012345678901234567890',
-      name: 'IOTA Token',
-      symbol: 'MIOTA',
+      name: 'SEI Token',
+      symbol: 'SEI',
       totalSupply: '2779530283277761',
       decimals: 18,
       holders: 12500,
@@ -498,7 +492,7 @@ function generateMockWhaleTransactions(tokens: Token[], timeframe: string): Whal
       
       // Random value based on token
       const baseValue = Math.random() * 100000; // Base value between 0 and 100,000
-      const valueMultiplier = token.symbol === 'MIOTA' || token.symbol === 'SMR' ? 10 : 1;
+      const valueMultiplier = token.symbol === 'SEI' ? 10 : 1;
       const value = baseValue * valueMultiplier;
       
       // Random timestamp within the timeframe

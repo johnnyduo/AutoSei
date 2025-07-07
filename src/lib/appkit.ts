@@ -29,28 +29,28 @@ type AppKitNetwork = {
   };
 };
 
-// Define IOTA EVM Testnet
-export const iotaTestnet = {
-  id: 1075,
-  name: 'IOTA EVM Testnet',
-  network: 'iota-testnet',
+// Define Sei EVM Testnet
+export const seiTestnet = {
+  id: 1328,
+  name: 'Sei EVM Testnet',
+  network: 'sei-testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'IOTA',
-    symbol: 'MIOTA',
+    name: 'SEI',
+    symbol: 'SEI',
   },
   rpcUrls: {
     default: {
-      http: ['https://json-rpc.evm.testnet.iotaledger.net'],
+      http: ['https://evm-rpc-testnet.sei-apis.com'],
     },
     public: {
-      http: ['https://json-rpc.evm.testnet.iotaledger.net'],
+      http: ['https://evm-rpc-testnet.sei-apis.com'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Explorer',
-      url: 'https://explorer.evm.testnet.iotaledger.net',
+      name: 'SeiTrace',
+      url: 'https://seitrace.com/?chain=atlantic-2',
     },
   },
 };
@@ -88,18 +88,18 @@ if (typeof window !== 'undefined') {
 
 // Setup wagmi adapter with correct type handling
 export const wagmiAdapter = new WagmiAdapter({
-  networks: [iotaTestnet] as AppKitNetwork[],
+  networks: [seiTestnet] as AppKitNetwork[],
   projectId
 });
 
 // Create modal with proper type handling
 export const modal = createAppKit({
   adapters: [wagmiAdapter],
-  networks: [iotaTestnet] as unknown as [AppKitNetwork, ...AppKitNetwork[]],
+  networks: [seiTestnet] as unknown as [AppKitNetwork, ...AppKitNetwork[]],
   metadata: {
-    name: 'AToIoTA',
-    description: 'AI-Powered Portfolio Allocation',
-    url: typeof window !== 'undefined' ? window.location.origin : 'https://atoiota.xyz',
+    name: 'AutoSei',
+    description: 'AI-Powered Portfolio Allocation on Sei',
+    url: typeof window !== 'undefined' ? window.location.origin : 'https://autosei.xyz',
     icons: ['https://img.icons8.com/3d-fluency/94/globe-africa.png']
   },
   projectId,

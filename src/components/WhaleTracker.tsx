@@ -231,11 +231,11 @@ const WhaleTracker = () => {
   };
 
   const getExplorerUrl = (hash: string) => {
-    return `https://explorer.evm.testnet.iota.cafe/tx/${hash || ''}`;
+    return `https://seitrace.com/?chain=atlantic-2&tx=${hash || ''}`;
   };
 
   const getAddressExplorerUrl = (address: string) => {
-    return `https://explorer.evm.testnet.iota.cafe/${address || ''}`;
+    return `https://seitrace.com/?chain=atlantic-2&address=${address || ''}`;
   };
 
   // Calculate statistics
@@ -360,7 +360,7 @@ const WhaleTracker = () => {
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">{selectedToken.name || 'Unknown'} ({selectedToken.symbol || 'Unknown'})</CardTitle>
               <a 
-                href={`https://explorer.evm.iota.org/token/${selectedToken.address || ''}`}
+                href={`https://seitrace.com/?chain=atlantic-2&token=${selectedToken.address || ''}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-nebula-400 hover:text-nebula-300 flex items-center"
@@ -446,7 +446,7 @@ const WhaleTracker = () => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-2xl">Whale Transaction Tracker</CardTitle>
-                <CardDescription>Monitor large token movements on the IOTA network</CardDescription>
+                <CardDescription>Monitor large token movements on the Sei network</CardDescription>
                 {/* Visual indicator for mock data */}
                 {isUsingMockData && (
                   <div className="text-xs text-amber-400 flex items-center mt-2">

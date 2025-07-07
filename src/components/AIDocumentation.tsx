@@ -13,7 +13,7 @@ const AIDocumentation = () => {
             <CardTitle className="text-2xl">AI System Documentation</CardTitle>
           </div>
           <CardDescription>
-            How AToIoTA uses artificial intelligence to enhance your DeFi experience
+            How AutoSei uses artificial intelligence to enhance your DeFi experience
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -45,8 +45,8 @@ const AIDocumentation = () => {
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-xl font-bold">AI-Powered DeFi Assistant</h2>
                 <p>
-                  AToIoTA uses advanced artificial intelligence to transform how users interact with 
-                  decentralized finance on the IOTA network. Our AI system combines multiple technologies 
+                  AutoSei uses advanced artificial intelligence to transform how users interact with 
+                  decentralized finance on the Sei network. Our AI system combines multiple technologies 
                   to provide intelligent portfolio management, market analysis, and on-chain insights.
                 </p>
                 
@@ -82,7 +82,7 @@ const AIDocumentation = () => {
                 </ul>
                 
                 <p>
-                  This multi-layered approach ensures that AToIoTA provides accurate, helpful, and 
+                  This multi-layered approach ensures that AutoSei provides accurate, helpful, and 
                   responsible AI assistance for your DeFi activities.
                 </p>
               </div>
@@ -92,7 +92,7 @@ const AIDocumentation = () => {
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-xl font-bold">AI Models</h2>
                 <p>
-                  AToIoTA leverages state-of-the-art AI models to power its intelligent features. 
+                  AutoSei leverages state-of-the-art AI models to power its intelligent features. 
                   Our primary AI engine is built on Google's Gemini 2.5 Pro, with specialized components 
                   for financial analysis and blockchain data processing.
                 </p>
@@ -101,7 +101,7 @@ const AIDocumentation = () => {
                   <h3 className="text-lg font-semibold text-nebula-400">Gemini 2.5 Pro</h3>
                   <p className="mt-2">
                     Gemini 2.5 Pro is Google's multimodal AI model that powers our natural language 
-                    understanding and generation capabilities. This model enables AToIoTA to:
+                    understanding and generation capabilities. This model enables AutoSei to:
                   </p>
                   <ul className="mt-2">
                     <li>Understand complex financial queries</li>
@@ -151,7 +151,7 @@ const AIDocumentation = () => {
               <div className="prose prose-invert max-w-none">
                 <h2 className="text-xl font-bold">Data Sources</h2>
                 <p>
-                  AToIoTA's AI system integrates multiple data sources to provide comprehensive insights 
+                  AutoSei's AI system integrates multiple data sources to provide comprehensive insights 
                   for DeFi decision-making. Our data pipeline combines on-chain data, market information, 
                   and historical patterns.
                 </p>
@@ -163,14 +163,14 @@ const AIDocumentation = () => {
                       On-Chain Data
                     </h3>
                     <ul className="mt-2">
-                      <li>IOTA Explorer API for transaction data</li>
+                      <li>Sei Explorer API for transaction data</li>
                       <li>Smart contract events and interactions</li>
                       <li>Token transfers and whale movements</li>
                       <li>Wallet behavior and patterns</li>
                       <li>Protocol metrics (TVL, volume, etc.)</li>
                     </ul>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Data is fetched in real-time from the IOTA blockchain for the most current insights.
+                      Data is fetched in real-time from the Sei blockchain for the most current insights.
                     </p>
                   </div>
                   
@@ -213,7 +213,7 @@ const AIDocumentation = () => {
                 
                 <h3 className="text-lg font-semibold mt-4">Data Privacy</h3>
                 <p>
-                  AToIoTA respects user privacy and data security:
+                  AutoSei respects user privacy and data security:
                 </p>
                 <ul>
                   <li>All blockchain data used is already publicly available</li>
@@ -243,7 +243,7 @@ const AIDocumentation = () => {
                 <div className="bg-cosmic-800 p-4 rounded-lg mt-4 font-mono text-sm overflow-x-auto">
                   <h3 className="text-nebula-400 font-semibold mb-2">Example: Whale Transaction Analysis Prompt</h3>
                   <pre className="whitespace-pre-wrap">
-{`You are a blockchain analyst specializing in whale transaction analysis for the IOTA ecosystem. 
+{`You are a blockchain analyst specializing in whale transaction analysis for the Sei ecosystem. 
 Analyze this whale transaction and provide insights:
 
 Transaction Details:
@@ -271,7 +271,7 @@ Keep your analysis factual and evidence-based. Mention if certain conclusions ar
                 <div className="bg-cosmic-800 p-4 rounded-lg mt-4 font-mono text-sm overflow-x-auto">
                   <h3 className="text-nebula-400 font-semibold mb-2">Example: Portfolio Rebalancing Prompt</h3>
                   <pre className="whitespace-pre-wrap">
-{`You are an AI portfolio advisor specializing in crypto asset allocation for the IOTA ecosystem.
+{`You are an AI portfolio advisor specializing in crypto asset allocation for the Sei ecosystem.
 Analyze the user's current portfolio and market conditions to provide rebalancing advice:
 
 Current Portfolio:
@@ -362,7 +362,7 @@ Clearly indicate when advice is speculative vs data-driven.`}
                 <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg mt-4">
                   <h3 className="text-amber-400 font-semibold">Important Disclaimer</h3>
                   <p className="mt-2">
-                    AToIoTA's AI features are designed to assist with portfolio management and market analysis, 
+                    AutoSei's AI features are designed to assist with portfolio management and market analysis, 
                     but all investment decisions should be made based on your own research and judgment. 
                     Cryptocurrency investments carry significant risks, and past performance is not indicative 
                     of future results.
@@ -442,7 +442,7 @@ Clearly indicate when advice is speculative vs data-driven.`}
                 <div className="rounded-full bg-nebula-500/20 p-1 mt-0.5">
                   <Database className="h-3 w-3 text-nebula-400" />
                 </div>
-                <span>Real-time IOTA blockchain data processing</span>
+                <span>Real-time Sei blockchain data processing</span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="rounded-full bg-nebula-500/20 p-1 mt-0.5">
@@ -523,13 +523,13 @@ Clearly indicate when advice is speculative vs data-driven.`}
             <CardTitle>Technical Implementation</CardTitle>
           </div>
           <CardDescription>
-            How our AI system is integrated into the AToIoTA platform
+            How our AI system is integrated into the AutoSei platform
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="prose prose-invert max-w-none">
             <p>
-              AToIoTA's AI capabilities are implemented through a sophisticated architecture that 
+              AutoSei's AI capabilities are implemented through a sophisticated architecture that 
               combines cloud-based AI services with local processing:
             </p>
             
@@ -607,7 +607,7 @@ Clearly indicate when advice is speculative vs data-driven.`}
               <li>Enhanced personalization through user preference learning</li>
               <li>More sophisticated market prediction models</li>
               <li>Expanded multimodal capabilities (chart analysis, document processing)</li>
-              <li>Deeper integration with IOTA's unique features and capabilities</li>
+              <li>Deeper integration with Sei's unique features and capabilities</li>
               <li>Additional language support for international users</li>
             </ul>
           </div>

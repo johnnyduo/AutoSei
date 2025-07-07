@@ -80,7 +80,7 @@ const mockTradingBots: TradingBot[] = [
     lastActive: '5 min ago',
     description: 'Smart DCA with dynamic intervals based on volatility',
     riskLevel: 'low',
-    targetAssets: ['sIOTA', 'SMR', 'AVAX'],
+    targetAssets: ['SEI', 'SMR', 'AVAX'],
     performance24h: 1.8,
     maxDrawdown: -2.1
   },

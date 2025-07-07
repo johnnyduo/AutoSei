@@ -3,7 +3,7 @@
 import { useContractRead, useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId } from 'wagmi';
 import { ethers, BrowserProvider, Contract } from 'ethers'; // Import from ethers v6
 import AutomatedPortfolioABI from '../abi/AutomatedPortfolio.json';
-import { iotaTestnet } from './chains';
+import { seiTestnet } from './chains';
 
 // Contract address from environment variable
 export const PORTFOLIO_CONTRACT_ADDRESS = (import.meta.env.VITE_PORTFOLIO_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
@@ -226,7 +226,7 @@ export function useUpdateAllocations() {
         address: PORTFOLIO_CONTRACT_ADDRESS,
         functionName: 'updateAllocations',
         args: [categories, percentages],
-        chain: iotaTestnet, // Use the fully defined chain object
+        chain: seiTestnet, // Use the fully defined chain object
         account: address
       });
 
@@ -259,12 +259,12 @@ export function useTransactionReceipt(hash?: `0x${string}`) {
 
 // Function to get explorer URL for a transaction
 export function getExplorerUrl(hash: string) {
-  const explorerUrl = import.meta.env.VITE_IOTA_EXPLORER_URL || 'https://explorer.evm.testnet.iota.cafe';
+  const explorerUrl = import.meta.env.VITE_SEI_EXPLORER_URL || 'https://seitrace.com/?chain=atlantic-2';
   return `${explorerUrl}/tx/${hash}`;
 }
 
 // Function to get explorer URL for an address
 export function getAddressExplorerUrl(address: string) {
-  const explorerUrl = import.meta.env.VITE_IOTA_EXPLORER_URL || 'https://explorer.evm.testnet.iota.cafe';
+  const explorerUrl = import.meta.env.VITE_SEI_EXPLORER_URL || 'https://seitrace.com/?chain=atlantic-2';
   return `${explorerUrl}/address/${address}`;
 }

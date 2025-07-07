@@ -1,11 +1,23 @@
-# AToIoTA: AI-Powered DeFi Portfolio Navigator for IOTA
+# AutoSei: AI-Powered DeFi Portfoli## AI System Architecture
+
+AutoSei's AI system uses a multi-layered approach:oSei's AI system uses a multi-layered approach:
+- **Large Language Models (LLMs)**: Google Gemini 2.5 Pro for natural language understanding and generation, fine-tuned for DeFi and blockchain.
+- **Rule-Based Systems**: For financial safety, compliance, and fallback responses.oSei's AI system uses a multi-layered approach:utoSei's AI system uses a multi-layered approach: Navigator for Sei
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Build](https://img.shields.io/badge/build-Vite%2BReact-blue)](https://vitejs.dev/)
 
 ## Overview
 
-AToIoTA is an advanced DeFi investment portfolio navigator for the IOTA EVM network, leveraging state-of-the-art artificial intelligence to transform how users interact with decentralized finance. The platform combines intelligent portfolio management, real-time market analysis, and on-chain insights, all powered by a hybrid AI system.
+AutoSei is an advanced DeFi investment portfolio navigator for the Sei EVM network, leveraging state-of-the-art artificial intelligence to transform how users interact with decentralized finance. The platform combines intelligent portfolio management, real-time market analysis, and on-chain insights, all powered by a hybrid AI system.
+
+## Network Configuration
+
+- **Chain ID**: 1328 (0x530)
+- **Network**: Sei EVM Testnet
+- **RPC URL**: https://evm-rpc-testnet.sei-apis.com
+- **Explorer**: https://seitrace.com/?chain=atlantic-2
+- **Native Token**: SEI
 
 ## Key Features
 
@@ -15,9 +27,13 @@ AToIoTA is an advanced DeFi investment portfolio navigator for the IOTA EVM netw
 - **Market Intelligence**: Analyze trends, token fundamentals, and trading opportunities using AI.
 - **Yield Comparison**: Compare DeFi protocol yields and optimize returns.
 - **Performance Tracking**: Visualize portfolio performance with custom charts.
-- **Token Management**: Manage all IOTA EVM tokens in a unified dashboard.
+- **Token Management**: Manage all Sei EVM tokens in a unified dashboard.
 - **Persistent AI Chat**: AI chat history is saved across sessions for seamless experience.
-- **Real-Time Data**: Integrates IOTA Explorer and CoinGecko APIs for up-to-date blockchain and market data.
+- **Real-Time Data**: Integrates SeiTrace Explorer and CoinGecko APIs for up-to-date blockchain and market data.
+
+## AI System Architecture
+
+AutoSei's AI system uses a multi-layered approach:
 
 ## AI System Architecture
 
@@ -28,7 +44,7 @@ AToIoTA’s AI system uses a multi-layered approach:
 - **On-Chain Data Analysis**: Provides blockchain intelligence and whale monitoring.
 
 ### Data Sources
-- **On-Chain Data**: IOTA Explorer API, smart contract events, token transfers, whale movements, protocol metrics.
+- **On-Chain Data**: SeiTrace Explorer API, smart contract events, token transfers, whale movements, protocol metrics.
 - **Market Data**: CoinGecko API for token prices, market caps, liquidity, and sentiment indicators.
 - **Privacy**: Only public blockchain data is used; user portfolio data is processed locally when possible.
 
@@ -48,8 +64,8 @@ AToIoTA’s AI system uses a multi-layered approach:
 
 ```sh
 # Clone the repository
-git clone https://github.com/johnnyduo/AToIoTA.git
-cd atoiota
+git clone https://github.com/johnnyduo/AutoSei.git
+cd autosei
 
 # Install dependencies
 npm install
@@ -91,22 +107,22 @@ npm run lint      # Lint code
 
 ## Smart Contract Deployment Attestation
 
-The portfolio allocation functionality is powered by a smart contract deployed on the IOTA EVM testnet. The contract address is specified in the `.env` file under the variable `VITE_CONTRACT_ADDRESS`.
+The portfolio allocation functionality is powered by a smart contract deployed on the Sei EVM testnet. The contract address is specified in the `.env` file under the variable `VITE_CONTRACT_ADDRESS`.
 
 ### Verify Deployment
 
-You can verify the deployment and interact with the contract on the IOTA testnet explorer:
+You can verify the deployment and interact with the contract on the Sei testnet explorer:
 
 - **Contract Address**: `VITE_CONTRACT_ADDRESS`
-- **Explorer URL**: [IOTA Testnet Explorer](https://explorer.iota.org/testnet/evm)
+- **Explorer URL**: [Sei Testnet Explorer](https://seitrace.com/?chain=atlantic-2)
 
 To view the contract details, replace `VITE_CONTRACT_ADDRESS` with the actual address from your `.env` file in the explorer URL.
 
 ### Proof of Deployment
 
-The smart contract for portfolio allocation has been successfully deployed on the IOTA EVM testnet. You can verify the deployment using the following link:
+The smart contract for portfolio allocation has been successfully deployed on the Sei EVM testnet. You can verify the deployment using the following link:
 
-- **Proof of Deployment**: [View on IOTA Testnet Explorer](https://explorer.evm.testnet.iotaledger.net/address/0x2921dbEd807E9ADfF57885a6666d82d6e6596AC2)
+- **Proof of Deployment**: [View on Sei Testnet Explorer](https://seitrace.com/?chain=atlantic-2)
 
 ## Usage Guidelines & Disclaimer
 
@@ -121,22 +137,22 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ## Contact
 
-For questions, feedback, or contributions, please open an issue or contact the maintainer via [GitHub Issues](https://github.com/johnnyduo/AToIoTA/issues).
+For questions, feedback, or contributions, please open an issue or contact the maintainer via [GitHub Issues](https://github.com/johnnyduo/AutoSei/issues).
 
 ## Demo
 
-Try AToIoTA: [https://atoiota.xyz](https://atoiota.xyz)
+Try AutoSei: [https://autosei.xyz](https://autosei.xyz)
 
 ## Screenshots
-![AToIoTA Dashboard](https://github.com/user-attachments/assets/1c55d6c2-a148-45a3-a9e2-ed7b0be309dd)
+![AutoSei Dashboard](https://github.com/user-attachments/assets/1c55d6c2-a148-45a3-a9e2-ed7b0be309dd)
 
 ## Team
 
-AToIoTA was created for the IOTA Moveathon 2025.
+AutoSei was created for the Sei ecosystem development.
 
-## Moveathon 2025
+## Sei Ecosystem
 
-This project was developed for the IOTA Moveathon 2025 under the DeFAI (DeFi + AI Integration) track.
+This project was developed for the Sei ecosystem to showcase advanced DeFi + AI Integration capabilities.
 
 ## Usage
 
@@ -152,7 +168,7 @@ For a detailed walkthrough, see our [User Guide](link-to-guide).
 - Q2 2025: 
 MVP development
 AI integration with Gemini 2.5 Pro
-IOTA EVM testnet deployment
+Sei EVM testnet deployment
 Initial user testing
 
 - Q3 2025: 
@@ -175,6 +191,6 @@ Integration with traditional finance systems
 
 ## Acknowledgments
 
-- IOTA Foundation for their support and documentation
+- Sei Foundation for their support and documentation
 - Google for access to the Gemini 2.5 Pro API
 - The open-source community for the various libraries used in this project

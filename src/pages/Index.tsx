@@ -13,10 +13,10 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>AToIoTA | IOTA EVM Investment Portfolio</title>
+        <title>AutoSei | Sei EVM Investment Portfolio</title>
         <meta 
           name="description" 
-          content="AI-powered DeFi investment portfolio navigator for the IOTA EVM network - AToIoTA" 
+          content="AI-powered DeFi investment portfolio navigator for the Sei EVM network - AutoSei" 
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Helmet>

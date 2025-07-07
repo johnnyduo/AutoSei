@@ -76,7 +76,7 @@ export async function generateTokenInsights(symbol: string, context?: string): P
       Keep your response concise (max 150 words) and focus only on data-driven insights.
       Format the response in a way that's easy to read with bullet points.
       
-      Note: This is for a portfolio management application focused on IOTA ecosystem tokens.
+      Note: This is for a portfolio management application focused on Sei ecosystem tokens.
     `;
 
     // Make the API request with retry logic
@@ -154,9 +154,9 @@ export async function generateChatResponse(
 
     // Create the prompt with context about the application
     const prompt = `
-      You are AToIoTA, an AI assistant specializing in cryptocurrency portfolio management and market analysis.
+      You are AutoSei, an AI assistant specializing in cryptocurrency portfolio management and market analysis.
       
-      Focus on these tokens in your responses: PUNK, AAP, ASMB, AUR, AVAX, BEAST, DEEP, ETH, FISH, FTM, FUSE, HODLHamster, IPG, NHU, LOVE, LUM, MATIC, MLUM, sIOTA, SMR, USDC, USDT, wBNB, wBTC, WEN.
+      Focus on these tokens in your responses: PUNK, AAP, ASMB, AUR, AVAX, BEAST, DEEP, ETH, FISH, FTM, FUSE, HODLHamster, IPG, NHU, LOVE, LUM, MATIC, MLUM, SEI, SMR, USDC, USDT, wBNB, wBTC, WEN.
       
       Categories include: AI, Meme, RWA (Real World Assets), Big Cap, DeFi, Layer 1, and Stablecoins.
       
@@ -372,7 +372,7 @@ export async function generateWhaleAnalysis(transaction: WhaleTransaction): Prom
   const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent';
 
   const prompt = `
-You are a blockchain analyst specializing in whale transaction analysis for the IOTA ecosystem. 
+You are a blockchain analyst specializing in whale transaction analysis for the Sei ecosystem. 
 Analyze this whale transaction and provide insights:
 
 Transaction Details:

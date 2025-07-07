@@ -62,8 +62,8 @@ interface BlockchainContextType {
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
 // Storage key for allocations in localStorage
-const ALLOCATIONS_STORAGE_KEY = 'atoiota_allocations';
-const TRANSACTIONS_STORAGE_KEY = 'atoiota_transactions';
+const ALLOCATIONS_STORAGE_KEY = 'autosei_allocations';
+const TRANSACTIONS_STORAGE_KEY = 'autosei_transactions';
 
 export function BlockchainProvider({ children }: { children: ReactNode }) {
   const { isConnected, address } = useAccount();

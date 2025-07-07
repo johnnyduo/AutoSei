@@ -29,7 +29,7 @@ interface ChatMessage {
 }
 
 // Storage key for chat messages in localStorage
-const CHAT_STORAGE_KEY = 'atoiota_chat_messages';
+const CHAT_STORAGE_KEY = 'autosei_chat_messages';
 
 // Enhanced market intelligence data for AI suggestions with realistic allocation changes
 const marketInsights = [
@@ -263,7 +263,7 @@ const AIChat = () => {
       {
         id: '1',
         sender: 'ai',
-        content: 'Hello! I\'m your AToIoTA assistant. I can help you manage your portfolio, provide market insights, and suggest optimal allocations. How can I assist you today?',
+        content: 'Hello! I\'m your AutoSei assistant. I can help you manage your portfolio, provide market insights, and suggest optimal allocations. How can I assist you today?',
         timestamp: new Date(),
       }
     ]);
@@ -602,7 +602,7 @@ const AIChat = () => {
         <CardHeader>
           <CardTitle className="text-2xl flex items-center">
             <Bot className="mr-2 h-6 w-6 text-nebula-400" />
-            AToIoTA Assistant
+            AutoSei Assistant
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -618,7 +618,7 @@ const AIChat = () => {
                         {msg.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                       </div>
                       <span className="ml-2 font-medium">
-                        {msg.sender === 'user' ? 'You' : 'AToIoTA Assistant'}
+                        {msg.sender === 'user' ? 'You' : 'AutoSei Assistant'}
                       </span>
                       <span className="ml-auto text-xs text-muted-foreground font-roboto-mono">
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -650,7 +650,7 @@ const AIChat = () => {
                       <div className="h-8 w-8 rounded-full bg-gradient-nebula flex items-center justify-center">
                         <Bot className="h-4 w-4" />
                       </div>
-                      <span className="ml-2 font-medium">AToIoTA Assistant</span>
+                      <span className="ml-2 font-medium">AutoSei Assistant</span>
                     </div>
                     <div className="flex space-x-1 mt-2">
                       <div className="h-2 w-2 bg-nebula-400 rounded-full animate-pulse"></div>
@@ -666,7 +666,7 @@ const AIChat = () => {
         <CardFooter className="p-4 border-t border-[#ffffff1a]">
           <div className="flex w-full space-x-2">
             <Input
-              placeholder="Ask AToIoTA assistant about market trends, tokens, or portfolio advice..."
+              placeholder="Ask AutoSei assistant about market trends, tokens, or portfolio advice..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

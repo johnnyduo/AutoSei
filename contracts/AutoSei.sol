@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title AutomatedPortfolio
- * @dev A smart contract for managing portfolio allocations across different asset categories
+ * @title AutoSeiPortfolio
+ * @dev A smart contract for managing portfolio allocations across different asset categories on Sei EVM
  */
-contract AutomatedPortfolio {
+contract AutoSeiPortfolio {
     address public owner;
     
     struct Allocation {

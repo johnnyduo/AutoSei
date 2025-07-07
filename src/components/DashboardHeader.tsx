@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import WalletConnectWrapper from '@/components/WalletConnectWrapper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { iotaTestnet } from '@/lib/chains';
+import { seiTestnet } from '@/lib/chains';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import AIDocumentation from '@/components/AIDocumentation';
@@ -16,21 +16,21 @@ const DashboardHeader = () => {
   const isMobile = useIsMobile();
 
   const handleFaucetClick = () => {
-    window.open('https://testnet.evm-bridge.iota.org/', '_blank');
+    window.open('https://seitrace.com/?chain=atlantic-2', '_blank');
   };
 
   const handleAddNetwork = async () => {
     // Check if MetaMask is installed
     if (typeof window.ethereum === 'undefined') {
       toast.error('MetaMask Not Found', {
-        description: 'Please install MetaMask to add the IOTA EVM Testnet.'
+        description: 'Please install MetaMask to add the Sei EVM Testnet.'
       });
       return;
     }
 
     try {
       // Convert chainId to hex format (required by MetaMask)
-      const chainIdHex = `0x${iotaTestnet.id.toString(16)}`;
+      const chainIdHex = `0x${seiTestnet.id.toString(16)}`;
       
       // First, try to switch to the network if it already exists
       try {
@@ -39,7 +39,7 @@ const DashboardHeader = () => {
           params: [{ chainId: chainIdHex }],
         });
         toast.success('Network Switched', {
-          description: 'Successfully switched to IOTA EVM Testnet.'
+          description: 'Successfully switched to Sei EVM Testnet.'
         });
         return;
       } catch (switchError: any) {
@@ -52,17 +52,15 @@ const DashboardHeader = () => {
         }
       }
       
-      // Prepare the network params with corrected symbol
-      // Note: MetaMask expects "IOTA" not "MIOTA" for this testnet
+      // Prepare the network params
       const networkParams = {
         chainId: chainIdHex,
-        chainName: iotaTestnet.name,
+        chainName: seiTestnet.name,
         nativeCurrency: {
-          ...iotaTestnet.nativeCurrency,
-          symbol: 'IOTA', // Override the symbol to match what MetaMask expects
+          ...seiTestnet.nativeCurrency,
         },
-        rpcUrls: [iotaTestnet.rpcUrls.default.http[0]],
-        blockExplorerUrls: [iotaTestnet.blockExplorers.default.url],
+        rpcUrls: [seiTestnet.rpcUrls.default.http[0]],
+        blockExplorerUrls: [seiTestnet.blockExplorers.default.url],
       };
       
       console.log('Adding network with params:', networkParams);
@@ -74,7 +72,7 @@ const DashboardHeader = () => {
       });
       
       toast.success('Network Added', {
-        description: 'IOTA EVM Testnet has been added to your wallet.'
+        description: 'Sei EVM Testnet has been added to your wallet.'
       });
     } catch (error: any) {
       console.error('Error adding network:', error);
@@ -83,7 +81,7 @@ const DashboardHeader = () => {
       if (error.message && error.message.includes('nativeCurrency.symbol does not match')) {
         toast.info(
           'Network Already Added', 
-          { description: 'The IOTA EVM Testnet is already in your wallet. Please switch to it manually.' }
+          { description: 'The Sei EVM Testnet is already in your wallet. Please switch to it manually.' }
         );
       } else {
         toast.error(
@@ -132,7 +130,7 @@ const DashboardHeader = () => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Add IOTA EVM Testnet to MetaMask</p>
+            <p>Add Sei EVM Testnet to MetaMask</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -166,7 +164,7 @@ const DashboardHeader = () => {
           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center animate-pulse-glow">
             <span className="font-space text-white text-2xl font-bold">A</span>
           </div>
-          <h1 className="text-3xl font-bold font-space cosmic-text">AToIoTA</h1>
+          <h1 className="text-3xl font-bold font-space cosmic-text">AutoSei</h1>
         </div>
         
         {/* Right side with wallet connect always visible and hamburger for other options */}
