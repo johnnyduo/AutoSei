@@ -327,8 +327,11 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <span 
-                          className="w-3 h-3 rounded-full mr-2" 
-                          style={{ backgroundColor: item.color }}
+                          className="w-3 h-3 rounded-full mr-2 border border-white/20 shadow-lg" 
+                          style={{ 
+                            backgroundColor: item.color,
+                            boxShadow: `0 2px 8px ${item.color}40, 0 0 0 1px rgba(255, 255, 255, 0.1)`
+                          }}
                         ></span>
                         <span className="font-medium">{item.name}</span>
                         {isRecommended && (
@@ -391,8 +394,11 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
                         <div key={`balance-${item.id}`} className="flex items-center justify-between">
                           <div className="flex items-center">
                             <span 
-                              className="w-2 h-2 rounded-full mr-2" 
-                              style={{ backgroundColor: item.color }}
+                              className="w-2 h-2 rounded-full mr-2 border border-white/20 shadow-md" 
+                              style={{ 
+                                backgroundColor: item.color,
+                                boxShadow: `0 1px 4px ${item.color}50, 0 0 0 1px rgba(255, 255, 255, 0.1)`
+                              }}
                             ></span>
                             <span className="text-sm">{item.name}</span>
                           </div>
@@ -493,7 +499,7 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
               Cancel
             </Button>
             <Button 
-              className="bg-primary text-primary-foreground hover:bg-primary/90" 
+              className="bg-gradient-button hover:opacity-90" 
               onClick={handleApply} 
               disabled={total !== 100 || isApplying || isUpdatingAllocations || transactionSubmitted}
             >
