@@ -9,7 +9,6 @@ import AllocationAdjuster from './AllocationAdjuster';
 import WhaleTracker from './WhaleTracker';
 import TradingBotsDashboard from './TradingBotsDashboard';
 import StrategiesMarketplace from './StrategiesMarketplace';
-import OnboardingWelcome from './OnboardingWelcome';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
@@ -18,7 +17,6 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [showOnboarding, setShowOnboarding] = useState(true);
   const isMobile = useIsMobile();
   
   return (
@@ -96,10 +94,6 @@ const Layout = ({ children }: LayoutProps) => {
           </TabsContent>
         </Tabs>
       </main>
-      
-      {showOnboarding && (
-        <OnboardingWelcome onComplete={() => setShowOnboarding(false)} />
-      )}
     </div>
   );
 };

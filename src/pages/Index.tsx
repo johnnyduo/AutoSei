@@ -1,7 +1,8 @@
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
+import LandingPage from '@/components/LandingPage';
 import PortfolioOverview from '@/components/PortfolioOverview';
 import TokenTable from '@/components/TokenTable';
 import PerformanceChart from '@/components/PerformanceChart';
@@ -13,10 +14,10 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>AutoSei | Sei EVM Investment Portfolio</title>
+        <title>AutoSei Dashboard | Sei EVM Investment Portfolio</title>
         <meta 
           name="description" 
-          content="AI-powered DeFi investment portfolio navigator for the Sei EVM network - AutoSei" 
+          content="AI-powered DeFi investment portfolio navigator for the Sei EVM network - AutoSei Dashboard" 
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Helmet>
@@ -37,9 +38,19 @@ const Dashboard = () => {
 };
 
 const Index = () => {
+  const [showLanding, setShowLanding] = useState(true);
+
+  const handleLaunchApp = () => {
+    setShowLanding(false);
+  };
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Dashboard />
+      {showLanding ? (
+        <LandingPage onLaunchApp={handleLaunchApp} />
+      ) : (
+        <Dashboard />
+      )}
     </Suspense>
   );
 };
