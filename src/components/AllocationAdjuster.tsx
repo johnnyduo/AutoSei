@@ -121,7 +121,7 @@ const AllocationAdjuster = () => {
               max={100}
               step={1}
               onValueChange={(value) => handleSliderChange(item.id, value[0])}
-              className="[&>span:first-child]:bg-gradient-orange-coral"
+              className="[&>span:first-child]:bg-primary"
             />
           </div>
         ))}
@@ -138,7 +138,7 @@ const AllocationAdjuster = () => {
           Reset
         </Button>
         <Button 
-          className="bg-gradient-button hover:opacity-90" 
+          className="bg-primary text-primary-foreground hover:bg-primary/90" 
           onClick={handleApplyChanges} 
           disabled={!hasChanges || total !== 100 || isUpdatingAllocations}
         >

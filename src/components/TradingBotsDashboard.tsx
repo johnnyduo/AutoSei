@@ -220,7 +220,7 @@ const TradingBotsDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-panel p-6">
+        <Card className="border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total P&L</p>
@@ -237,7 +237,7 @@ const TradingBotsDashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Bots</p>
@@ -249,19 +249,19 @@ const TradingBotsDashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Allocation</p>
               <p className="text-2xl font-bold text-foreground">${totalAllocation.toLocaleString()}</p>
             </div>
-            <div className="p-3 rounded-full bg-cosmic-500/20">
-              <DollarSign className="h-6 w-6 text-cosmic-500" />
+            <div className="p-3 rounded-full bg-primary/20">
+              <DollarSign className="h-6 w-6 text-primary" />
             </div>
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Avg Win Rate</p>
@@ -287,19 +287,19 @@ const TradingBotsDashboard: React.FC = () => {
               size="sm"
               onClick={refreshData}
               disabled={refreshing}
-              className="neuro-button"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
             <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
               <DialogTrigger asChild>
-                <Button className="neuro-button">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary">
                   <Settings className="h-4 w-4 mr-2" />
                   Configure Bot
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl glass-overlay">
+              <DialogContent className="max-w-2xl border-border bg-card">
                 <DialogHeader>
                   <DialogTitle>Configure Trading Bot</DialogTitle>
                 </DialogHeader>
@@ -308,12 +308,12 @@ const TradingBotsDashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Bot Name</Label>
-                      <Input className="neuro-input" placeholder="Enter bot name" />
+                      <Input className="bg-background border-border" placeholder="Enter bot name" />
                     </div>
                     <div>
                       <Label>Strategy</Label>
                       <Select>
-                        <SelectTrigger className="neuro-input">
+                        <SelectTrigger className="bg-background border-border">
                           <SelectValue placeholder="Select strategy" />
                         </SelectTrigger>
                         <SelectContent>
@@ -333,7 +333,7 @@ const TradingBotsDashboard: React.FC = () => {
                     <Button variant="outline" onClick={() => setIsConfigOpen(false)}>
                       Cancel
                     </Button>
-                    <Button className="neuro-button">
+                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                       Create Bot
                     </Button>
                   </div>
@@ -347,7 +347,7 @@ const TradingBotsDashboard: React.FC = () => {
             {bots.map((bot) => (
               <div
                 key={bot.id}
-                className="glass-interactive p-6 rounded-xl cursor-pointer group"
+                className="border border-border bg-card p-6 rounded-xl cursor-pointer group hover:border-primary/50 transition-all duration-200"
                 onClick={() => setSelectedBot(bot)}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -412,12 +412,11 @@ const TradingBotsDashboard: React.FC = () => {
                     <Switch
                       checked={bot.status === 'active'}
                       onCheckedChange={() => toggleBotStatus(bot.id)}
-                      className="neuro-button"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Assets:</span>
                     {bot.targetAssets.map((asset, index) => (

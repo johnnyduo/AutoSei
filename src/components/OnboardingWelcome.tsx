@@ -263,12 +263,12 @@ const OnboardingWelcome: React.FC<{ onComplete: () => void }> = ({ onComplete })
             </Button>
             <div className="flex items-center gap-3">
               {currentStep < onboardingSteps.length - 1 ? (
-                <Button onClick={nextStep} className="neuro-button group">
+                <Button onClick={nextStep} className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary group">
                   {onboardingSteps[currentStep].action || 'Next'}
                   <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               ) : (
-                <Button onClick={completeOnboarding} className="neuro-button group animate-pulse-glow">
+                <Button onClick={completeOnboarding} className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary group animate-pulse-glow">
                   <Zap className="w-4 h-4 mr-2" />
                   Start Trading
                   <Sparkles className="w-4 h-4 ml-2" />

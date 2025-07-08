@@ -218,7 +218,7 @@ const CategorySelector = () => {
                 Cancel
               </Button>
               <Button 
-                className="bg-gradient-button hover:opacity-90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => applyStrategy(selectedStrategy)}
               >
                 Apply Strategy

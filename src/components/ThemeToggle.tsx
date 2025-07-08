@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toggleThemeWithEffects } from '@/lib/themeTransitions';
 
 const ThemeToggle: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mounted, setMounted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -17,19 +19,36 @@ const ThemeToggle: React.FC = () => {
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     setTheme(initialTheme);
     
-    // Apply theme to document
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(initialTheme);
-  }, []);
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        const systemTheme = e.matches ? 'dark' : 'light';
+        setTheme(systemTheme);
+        // Apply theme change with effects
+        toggleThemeWithEffects(theme === systemTheme ? (systemTheme === 'light' ? 'dark' : 'light') : theme);
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, [theme]);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    if (isAnimating) return; // Prevent multiple clicks during animation
     
-    // Apply theme to document
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(newTheme);
+    setIsAnimating(true);
+    
+    // Use enhanced theme toggle with visual effects
+    const newTheme = toggleThemeWithEffects(theme);
+    
+    // Update local state after a delay to sync with the animation
+    setTimeout(() => {
+      setTheme(newTheme);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 300);
+    }, 150);
   };
 
   // Don't render on server-side
@@ -37,11 +56,10 @@ const ThemeToggle: React.FC = () => {
     return (
       <Button
         variant="ghost"
-        size="icon"
-        className="relative w-10 h-10 rounded-full"
+        className="w-9 h-9 p-0 rounded-full border border-border hover:border-primary/40 transition-all duration-300 flex items-center justify-center"
         disabled
       >
-        <Sun className="h-5 w-5" />
+        <Sun className="h-4 w-4 text-primary" />
       </Button>
     );
   }
@@ -52,12 +70,26 @@ const ThemeToggle: React.FC = () => {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
             onClick={toggleTheme}
-            className="relative w-10 h-10 rounded-full hover:bg-accent transition-colors"
+            disabled={isAnimating}
+            className={`
+              w-9 h-9 p-0 rounded-full border border-border hover:border-primary/40 
+              hover:bg-primary/10 transition-all duration-300 overflow-hidden flex items-center justify-center
+              ${isAnimating ? 'animate-pulse' : ''}
+            `}
           >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            {/* Icon container with simple animations */}
+            <div className="relative w-4 h-4">
+              <Sun className={`
+                absolute inset-0 w-4 h-4 text-primary transition-all duration-500
+                ${theme === 'dark' ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'}
+              `} />
+              <Moon className={`
+                absolute inset-0 w-4 h-4 text-primary transition-all duration-500
+                ${theme === 'light' ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'}
+              `} />
+            </div>
+            
             <span className="sr-only">Toggle theme</span>
           </Button>
         </TooltipTrigger>

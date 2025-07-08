@@ -135,7 +135,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 <Button 
                   onClick={handleLaunchApp} 
                   disabled={isLoading}
-                  className="neuro-button hover:scale-105 transition-all"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
@@ -176,7 +176,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   size="lg" 
                   onClick={handleLaunchApp}
                   disabled={isLoading}
-                  className="neuro-button text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
@@ -231,8 +231,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 {features.map((feature, index) => (
                   <Card 
                     key={index}
-                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-                      activeFeature === index ? 'ring-2 ring-primary shadow-lg' : 'hover:ring-1 hover:ring-primary/50'
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg border border-border ${
+                      activeFeature === index ? 'ring-2 ring-primary shadow-lg bg-accent/50' : 'hover:ring-1 hover:ring-primary/50'
                     }`}
                     onClick={() => setActiveFeature(index)}
                   >
@@ -255,7 +255,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
               </div>
               
               {/* Feature Visualization */}
-              <div className="glass-panel p-8 rounded-2xl animate-float">
+              <div className="border border-border bg-card p-8 rounded-2xl animate-float">
                 <div className="text-center mb-6">
                   <div className={`inline-flex p-4 rounded-full bg-gradient-to-r ${features[activeFeature].color} text-white mb-4`}>
                     {React.createElement(features[activeFeature].icon, { className: "w-12 h-12" })}
@@ -340,7 +340,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   size="lg" 
                   variant="outline" 
                   onClick={() => handleSocialClick('discord')}
-                  className="border-white text-white hover:bg-white/10 text-lg px-8 py-6 transition-colors"
+                  className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground text-lg px-8 py-6 transition-all duration-300 font-semibold"
                 >
                   <Users className="w-5 h-5 mr-2" />
                   Join Community

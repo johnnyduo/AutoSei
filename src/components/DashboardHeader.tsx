@@ -17,7 +17,7 @@ const DashboardHeader = () => {
   const isMobile = useIsMobile();
 
   const handleFaucetClick = () => {
-    window.open('https://seitrace.com/?chain=atlantic-2', '_blank');
+    window.open('https://seitrace.com/tool/faucet?chain=atlantic-2', '_blank');
   };
 
   const handleAddNetwork = async () => {
@@ -103,7 +103,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-orange-coral text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-primary text-primary-foreground border-primary hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
               onClick={() => setShowAIDocumentation(true)}
             >
               <Bot className="h-4 w-4 mr-2" />
@@ -123,7 +123,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-orange-500 to-coral-500 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 w-full md:w-auto justify-start md:justify-center"
               onClick={handleAddNetwork}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -143,7 +143,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-coral-500 to-burgundy-500 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90 w-full md:w-auto justify-start md:justify-center"
               onClick={handleFaucetClick}
             >
               <Droplets className="h-4 w-4 mr-2" />
@@ -161,35 +161,35 @@ const DashboardHeader = () => {
   return (
     <>
       <div className="flex items-center justify-between py-6 px-4 md:px-8">
-        <div className="flex items-center space-x-3">
-          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-burgundy-500 flex items-center justify-center animate-pulse-glow">
-            <span className="font-space text-white text-2xl font-bold">A</span>
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.location.reload()}>
+          <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center animate-pulse-glow">
+            <span className="font-space text-primary-foreground text-2xl font-bold">A</span>
           </div>
           <h1 className="text-3xl font-bold font-space cosmic-text">AutoSei</h1>
         </div>
         
         {/* Right side with wallet connect always visible and hamburger for other options */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
           <ThemeToggle />
           
           {/* Wallet Connect button always visible */}
           <WalletConnectWrapper />
 
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             <ActionButtons />
           </div>
 
           {/* Mobile hamburger menu */}
-          <div className="flex md:hidden items-center space-x-4">
+          <div className="flex md:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="p-2"
+                  className="w-9 h-9 p-0"
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[250px]">

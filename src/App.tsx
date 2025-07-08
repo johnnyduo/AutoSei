@@ -8,6 +8,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { WagmiProvider } from 'wagmi';
 import { wagmiAdapter } from '@/lib/appkit';
 import { BlockchainProvider } from '@/contexts/BlockchainContext';
+import { initializeThemeTransitions, initializeTheme } from '@/lib/themeTransitions';
+import { useEffect } from 'react';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -16,6 +18,12 @@ const queryClient = new QueryClient();
 
 // Simplified AppContent without the hook
 function AppContent() {
+  useEffect(() => {
+    // Initialize theme system with smooth transitions
+    initializeTheme();
+    initializeThemeTransitions();
+  }, []);
+
   return (
     <BlockchainProvider>
       <HelmetProvider>

@@ -435,8 +435,8 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                     >
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center">
-                            <span className="font-medium text-xs">{token.symbol.substring(0, 2)}</span>
+                          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                            <span className="font-medium text-xs text-primary-foreground">{token.symbol.substring(0, 2)}</span>
                           </div>
                           <div>
                             <div className="font-medium">{token.name}</div>
@@ -471,7 +471,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                         {formatNumber(token.volume)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge className="bg-gradient-button">{token.allocation}%</Badge>
+                        <Badge className="bg-primary text-primary-foreground">{token.allocation}%</Badge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -533,8 +533,8 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
               <DialogTitle className="flex items-center">
                 {selectedToken && (
                   <>
-                    <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center mr-2">
-                      <span className="font-medium text-xs">{selectedToken.symbol.substring(0, 2)}</span>
+                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center mr-2">
+                      <span className="font-medium text-xs text-primary-foreground">{selectedToken.symbol.substring(0, 2)}</span>
                     </div>
                     {selectedToken.name} ({selectedToken.symbol}) Insights
                   </>

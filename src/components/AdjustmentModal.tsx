@@ -493,7 +493,7 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
               Cancel
             </Button>
             <Button 
-              className="bg-gradient-button hover:opacity-90" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90" 
               onClick={handleApply} 
               disabled={total !== 100 || isApplying || isUpdatingAllocations || transactionSubmitted}
             >

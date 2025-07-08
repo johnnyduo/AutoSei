@@ -171,7 +171,7 @@ const WhaleTracker = () => {
         return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
       case 'small':
       default:
-        return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 

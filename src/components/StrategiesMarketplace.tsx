@@ -340,14 +340,14 @@ const StrategiesMarketplace: React.FC = () => {
                 placeholder="Search strategies, tags, or creators..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="neuro-input pl-10"
+                className="bg-background border-border pl-10"
               />
             </div>
           </div>
           
           <div className="flex flex-wrap gap-2">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="neuro-input w-40">
+              <SelectTrigger className="bg-background border-border w-40">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -359,7 +359,7 @@ const StrategiesMarketplace: React.FC = () => {
             </Select>
 
             <Select value={selectedRisk} onValueChange={setSelectedRisk}>
-              <SelectTrigger className="neuro-input w-32">
+              <SelectTrigger className="bg-background border-border w-32">
                 <SelectValue placeholder="Risk" />
               </SelectTrigger>
               <SelectContent>
@@ -371,7 +371,7 @@ const StrategiesMarketplace: React.FC = () => {
             </Select>
 
             <Select value={selectedComplexity} onValueChange={setSelectedComplexity}>
-              <SelectTrigger className="neuro-input w-40">
+              <SelectTrigger className="bg-background border-border w-40">
                 <SelectValue placeholder="Complexity" />
               </SelectTrigger>
               <SelectContent>
@@ -383,7 +383,7 @@ const StrategiesMarketplace: React.FC = () => {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="neuro-input w-36">
+              <SelectTrigger className="bg-background border-border w-36">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -503,7 +503,7 @@ const StrategiesMarketplace: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="neuro-button">
+                      <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary">
                         Details
                       </Button>
                     </DialogTrigger>
@@ -579,7 +579,7 @@ const StrategiesMarketplace: React.FC = () => {
                           <Button variant="outline">
                             Backtest
                           </Button>
-                          <Button className="neuro-button">
+                          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary">
                             <Download className="h-4 w-4 mr-2" />
                             Deploy Strategy
                           </Button>
@@ -587,7 +587,7 @@ const StrategiesMarketplace: React.FC = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <Button size="sm" className="neuro-button">
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary">
                     <Download className="h-4 w-4 mr-2" />
                     Deploy
                   </Button>

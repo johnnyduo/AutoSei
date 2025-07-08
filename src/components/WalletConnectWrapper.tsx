@@ -65,7 +65,7 @@ const WalletConnectWrapper = () => {
               onClick={handleConnect}
               variant="outline" 
               size="sm"
-              className="bg-gradient-orange-coral text-white border-none hover:opacity-90 transition-all"
+              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 transition-all"
             >
               <Wallet className="w-4 h-4 mr-2" />
               Connect Wallet
@@ -88,7 +88,7 @@ const WalletConnectWrapper = () => {
               variant="outline"
               size="sm"
               onClick={handleCopyAddress}
-              className="bg-gradient-orange-coral text-white border-none hover:opacity-90 transition-all"
+              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 transition-all"
             >
               <Copy className="w-4 h-4 mr-2" />
               <span className="font-mono">{formatAddress(address)}</span>
@@ -105,7 +105,7 @@ const WalletConnectWrapper = () => {
               variant="outline"
               size="sm"
               onClick={handleDisconnect}
-              className="bg-gradient-coral-burgundy text-white border-none hover:opacity-90 transition-all"
+              className="bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90 transition-all"
             >
               <LogOut className="w-4 h-4" />
             </Button>

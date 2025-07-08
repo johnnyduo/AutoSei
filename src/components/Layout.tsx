@@ -26,45 +26,45 @@ const Layout = ({ children }: LayoutProps) => {
       <main className="flex-1 container mx-auto py-4 md:py-6 px-2 md:px-4 pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-4 md:mb-8 overflow-x-auto">
-            <TabsList className="glass-panel p-1 rounded-xl">
+            <TabsList className="bg-background/95 backdrop-blur-sm border border-border rounded-xl p-1.5 shadow-md">
               <TabsTrigger 
                 value="dashboard" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-3 md:px-4 py-2.5 rounded-lg text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <LayoutDashboard className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Dashboard</span>
+                <span className="text-xs md:text-sm font-medium">Dashboard</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="bots" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-3 md:px-4 py-2.5 rounded-lg text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <Bot className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Trading Bots</span>
+                <span className="text-xs md:text-sm font-medium">Trading Bots</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="strategies" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-3 md:px-4 py-2.5 rounded-lg text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <BarChart2 className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Strategies</span>
+                <span className="text-xs md:text-sm font-medium">Strategies</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="chat" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-3 md:px-4 py-2.5 rounded-lg text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <MessageCircle className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">AI Chat</span>
+                <span className="text-xs md:text-sm font-medium">AI Chat</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="settings" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-3 md:px-4 py-2.5 rounded-lg text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
               >
                 <Settings className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Settings</span>
+                <span className="text-xs md:text-sm font-medium">Settings</span>
               </TabsTrigger>
             </TabsList>
           </div>

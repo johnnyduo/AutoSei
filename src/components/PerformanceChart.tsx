@@ -163,8 +163,8 @@ const PerformanceChart = () => {
               size="sm"
               className={`px-2 md:px-3 rounded-lg text-xs md:text-sm ${
                 timeRange === range.id 
-                ? 'bg-nebula-600 text-white' 
-                : 'hover:bg-white/10'
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-accent'
               }`}
               onClick={() => setTimeRange(range.id)}
               disabled={!isConnected}
@@ -177,9 +177,9 @@ const PerformanceChart = () => {
       <CardContent className="pt-0">
         {!isConnected ? (
           <div className="h-[250px] md:h-[300px] w-full flex flex-col items-center justify-center">
-            <WalletIcon className="h-8 w-8 md:h-12 md:w-12 text-gray-500 mb-4" />
+            <WalletIcon className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground text-center text-xs md:text-sm px-4">Connect your wallet to view your portfolio performance</p>
-            <Button variant="outline" className="mt-4 bg-nebula-600/20 hover:bg-nebula-600/30 text-xs md:text-sm">
+            <Button variant="outline" className="mt-4 bg-primary/20 hover:bg-primary/30 text-xs md:text-sm">
               <WalletIcon className="h-3 w-3 md:h-4 md:w-4 mr-2" />
               Connect Wallet
             </Button>

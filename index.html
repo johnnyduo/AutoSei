@@ -20,9 +20,22 @@
         WALLET_CONNECT_PROJECT_ID: '09fc7dba755d62670df0095c041ed441'
       };
     </script>
+    <script>
+      // Theme initialization script to prevent flickering
+      (function() {
+        const theme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialTheme = theme || (prefersDark ? 'dark' : 'light');
+        
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(initialTheme);
+        document.documentElement.setAttribute('data-theme', initialTheme);
+        document.documentElement.style.colorScheme = initialTheme;
+      })();
+    </script>
   </head>
 
-  <body class="dark">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

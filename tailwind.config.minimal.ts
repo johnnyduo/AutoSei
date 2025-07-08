@@ -56,6 +56,8 @@ export default {
       },
       backgroundImage: {
         'gradient-banner': 'radial-gradient(128.89% 226.02% at 72.66% 226%, rgb(255, 108, 35) 14.02%, rgb(247, 123, 92) 58.63%, rgb(136, 0, 57) 100%)',
+        'gradient-orange-coral': 'linear-gradient(135deg, rgb(255, 108, 35) 0%, rgb(247, 123, 92) 100%)',
+        'gradient-coral-burgundy': 'linear-gradient(180deg, rgb(247, 123, 92) 0%, rgb(136, 0, 57) 100%)',
       },
     }
   },
