@@ -3,11 +3,13 @@ import { useContractRead, useWriteContract, useWaitForTransactionReceipt, useAcc
 import { ethers, BrowserProvider, Contract } from 'ethers'; // Import from ethers v6
 import AutoSeiPortfolioCoreABI from '../abi/AutoSeiPortfolioCore.json';
 import AutoSeiPortfolioABI from '../abi/AutoSeiPortfolio.json';
+import MockUSDCABI from '../abi/MockUSDC.json';
 import { seiTestnet } from './chains';
 
 // Contract addresses from environment variables
 export const AUTOSEI_PORTFOLIO_CORE_ADDRESS = (import.meta.env.VITE_AUTOSEI_PORTFOLIO_CORE_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
 export const AUTOSEI_PORTFOLIO_FULL_ADDRESS = (import.meta.env.VITE_AUTOSEI_PORTFOLIO_FULL_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
+export const MOCK_USDC_ADDRESS = (import.meta.env.VITE_MOCK_USDC_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
 
 // Contract configurations
 export const CONTRACT_CONFIGS = {
@@ -20,6 +22,11 @@ export const CONTRACT_CONFIGS = {
     address: AUTOSEI_PORTFOLIO_FULL_ADDRESS,
     abi: AutoSeiPortfolioABI,
     name: 'AutoSeiPortfolio'
+  },
+  usdc: {
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    name: 'MockUSDC'
   }
 };
 
@@ -741,6 +748,174 @@ export const logContractConfiguration = () => {
   console.log('=== AutoSei Contract Configuration ===');
   console.log('Core Contract (AutoSeiPortfolioCore):', AUTOSEI_PORTFOLIO_CORE_ADDRESS);
   console.log('Full Contract (AutoSeiPortfolio):', AUTOSEI_PORTFOLIO_FULL_ADDRESS);
+  console.log('Mock USDC Contract:', MOCK_USDC_ADDRESS);
   console.log('Contract validation:', validateContractAddresses());
   console.log('=====================================');
 };
+
+// USDC Contract Hooks
+// Hook to get USDC balance for a user
+export function useUSDCBalance(address?: `0x${string}`) {
+  return useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!address && !!MOCK_USDC_ADDRESS,
+      refetchInterval: 10000, // Refetch every 10 seconds
+    }
+  });
+}
+
+// Hook to get USDC token info
+export function useUSDCInfo() {
+  const { data: name } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'name',
+  });
+
+  const { data: symbol } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'symbol',
+  });
+
+  const { data: decimals } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'decimals',
+  });
+
+  const { data: totalSupply } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'totalSupply',
+  });
+
+  return {
+    name,
+    symbol,
+    decimals,
+    totalSupply,
+    address: MOCK_USDC_ADDRESS
+  };
+}
+
+// Hook to claim free USDC from faucet
+export function useUSDCFaucet() {
+  const { writeContract, isPending, error, isSuccess, data } = useWriteContract();
+  const { address } = useAccount();
+  const chainId = useChainId();
+
+  const claimFaucet = async () => {
+    if (!address) throw new Error('Wallet not connected');
+    if (!MOCK_USDC_ADDRESS || MOCK_USDC_ADDRESS === '0x0000000000000000000000000000000000000000') {
+      throw new Error('USDC contract address not configured');
+    }
+
+    try {
+      console.log('Claiming USDC faucet for address:', address);
+      console.log('USDC contract address:', MOCK_USDC_ADDRESS);
+      console.log('Chain ID:', chainId);
+      
+      // Call writeContract with proper parameters
+      const hash = await writeContract({
+        address: MOCK_USDC_ADDRESS,
+        abi: MockUSDCABI,
+        functionName: 'faucet',
+        args: [],
+        chain: seiTestnet,
+        account: address
+      });
+      
+      console.log('Faucet transaction hash:', hash);
+      return { hash };
+    } catch (error) {
+      console.error('Error claiming USDC faucet:', error);
+      
+      // Enhanced error handling with specific faucet errors
+      if (error instanceof Error) {
+        if (error.message.includes('user rejected')) {
+          throw new Error('Transaction was rejected by user');
+        } else if (error.message.includes('insufficient funds')) {
+          throw new Error('Insufficient SEI for gas fees');
+        } else if (error.message.includes('Already has enough tokens')) {
+          throw new Error('You already have 1000+ USDC. Faucet is limited to accounts with less than 1000 USDC.');
+        } else if (error.message.includes('Exceeds max supply')) {
+          throw new Error('Faucet has reached maximum supply limit');
+        } else if (error.message.includes('execution reverted')) {
+          throw new Error('Contract execution failed. You may already have enough USDC (>1000) or the faucet is empty.');
+        } else if (error.message.includes('awaiting_internal_transactions')) {
+          throw new Error('Transaction is processing. Please wait a moment and check your balance.');
+        }
+      }
+      
+      throw new Error(`Faucet claim failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  return {
+    claimFaucet,
+    isPending,
+    error,
+    isSuccess,
+    transaction: data
+  };
+}
+
+// Utility function to format USDC amount (6 decimals)
+export function formatUSDCAmount(amount: bigint | undefined, decimals: number = 6): string {
+  if (!amount) return '0.00';
+  
+  const divisor = 10n ** BigInt(decimals);
+  const wholePart = amount / divisor;
+  const fractionalPart = amount % divisor;
+  
+  // Format to 2 decimal places for display
+  const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+  const twoDecimals = fractionalStr.slice(0, 2);
+  
+  return `${wholePart}.${twoDecimals}`;
+}
+
+// Utility function to parse USDC amount for transactions
+export function parseUSDCAmount(amount: string, decimals: number = 6): bigint {
+  const [whole, fractional = ''] = amount.split('.');
+  const paddedFractional = fractional.padEnd(decimals, '0').slice(0, decimals);
+  const combined = whole + paddedFractional;
+  return BigInt(combined);
+}
+
+// Utility function to check USDC contract deployment
+export function useUSDCContractStatus() {
+  const { data: name } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'name',
+    query: {
+      retry: 1,
+    }
+  });
+
+  const { data: totalSupply } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: MockUSDCABI,
+    functionName: 'totalSupply',
+    query: {
+      retry: 1,
+    }
+  });
+
+  const isDeployed = !!name && !!totalSupply;
+  const contractAddress = MOCK_USDC_ADDRESS;
+
+  return {
+    isDeployed,
+    contractAddress,
+    name,
+    totalSupply,
+    isValid: isDeployed && contractAddress !== '0x0000000000000000000000000000000000000000'
+  };
+}

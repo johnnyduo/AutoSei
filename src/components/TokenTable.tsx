@@ -435,8 +435,8 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                     >
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                            <span className="font-medium text-xs text-primary-foreground">{token.symbol.substring(0, 2)}</span>
+                          <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center">
+                            <span className="font-medium text-xs">{token.symbol.substring(0, 2)}</span>
                           </div>
                           <div>
                             <div className="font-medium">{token.name}</div>
@@ -471,7 +471,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                         {formatNumber(token.volume)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge className="bg-primary text-primary-foreground">{token.allocation}%</Badge>
+                        <Badge className="bg-gradient-button">{token.allocation}%</Badge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -526,96 +526,33 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
             </div>
           </CardContent>
         </Card>
-        {/* Enhanced Token Insights Dialog */}
+        {/* Token Insights Dialog */}
         <Dialog open={!!selectedToken} onOpenChange={(open) => !open && setSelectedToken(null)}>
-          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto bg-background border-border">
+          <DialogContent className="sm:max-w-[600px] bg-cosmic-900 border-cosmic-700">
             <DialogHeader>
-              <DialogTitle className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {selectedToken && (
-                    <>
-                      <div 
-                        className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold mr-3"
-                        style={{ backgroundColor: categoryColors[selectedToken.category] || '#6B7280' }}
-                      >
-                        {selectedToken.symbol.substring(0, 2)}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span>{selectedToken.name}</span>
-                          <Badge variant="secondary">{selectedToken.symbol}</Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {selectedToken.category.charAt(0).toUpperCase() + selectedToken.category.slice(1)} • {selectedToken.change24h > 0 ? '+' : ''}{selectedToken.change24h.toFixed(1)}%
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-                    <span>Powered by Gemini 2.5 Pro</span>
-                  </div>
-                </div>
+              <DialogTitle className="flex items-center">
+                {selectedToken && (
+                  <>
+                    <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center mr-2">
+                      <span className="font-medium text-xs">{selectedToken.symbol.substring(0, 2)}</span>
+                    </div>
+                    {selectedToken.name} ({selectedToken.symbol}) Insights
+                  </>
+                )}
               </DialogTitle>
             </DialogHeader>
-            <div className="py-4">
+            <div className="py-4 px-2">
               {isInsightLoading ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="relative">
-                    <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">AI</span>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground mt-4 text-center">
-                    Analyzing {selectedToken?.symbol} with AI insights...
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Powered by Google's Gemini 2.5 Pro
-                  </p>
+                <div className="flex flex-col items-center justify-center py-8">
+                  <RefreshCw className="h-8 w-8 animate-spin mb-4 text-nebula-400" />
+                  <p className="text-muted-foreground">Generating AI insights...</p>
                 </div>
               ) : tokenInsight ? (
-                <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-200/20">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">AI</span>
-                      </div>
-                      <span className="font-medium">AI Market Analysis</span>
-                      <Badge variant="outline" className="text-xs border-purple-200">
-                        Gemini 2.5 Pro
-                      </Badge>
-                    </div>
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                        {tokenInsight}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-                      <span>Analysis generated by Google's Gemini 2.5 Pro</span>
-                    </div>
-                    <span>{new Date().toLocaleTimeString()}</span>
-                  </div>
+                <div className="prose prose-invert max-w-none">
+                  <div className="whitespace-pre-wrap">{tokenInsight}</div>
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">AI</span>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground">No insights available</p>
-                  <p className="text-sm text-muted-foreground">
-                    {isGeminiEnabled ? 'Failed to generate insights' : 'Gemini API not configured'}
-                  </p>
-                </div>
+                <p className="text-center text-muted-foreground">No insights available</p>
               )}
             </div>
           </DialogContent>

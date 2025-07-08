@@ -62,7 +62,11 @@ const getProjectId = () => {
   if (typeof window !== 'undefined') {
     // Try to get from import.meta.env (Vite)
     if (import.meta.env && import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID) {
-      return import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+      const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+      // Don't use placeholder values
+      if (projectId && projectId !== 'your_wallet_connect_project_id_here') {
+        return projectId;
+      }
     }
     
     // Check if it's available in window.ENV (if you set it that way)
@@ -71,29 +75,30 @@ const getProjectId = () => {
     }
   }
   
-  // Fallback for development or if env var is missing
-  return '09fc7dba755d62670df0095c041ed441';
+  // Return undefined if no valid project ID is found - this will disable some features
+  // instead of making failed API calls
+  console.warn('⚠️ WalletConnect Project ID not configured. Some wallet features may be limited.');
+  console.log('💡 To fix: Set VITE_WALLET_CONNECT_PROJECT_ID in your .env.local file');
+  return undefined;
 };
 
 // Get the project ID
 export const projectId = getProjectId();
 
-// Log the project ID (masked for security)
-if (typeof window !== 'undefined') {
-  const maskedId = projectId ? 
-    `${projectId.substring(0, 4)}...${projectId.substring(projectId.length - 4)}` : 
-    'undefined';
-  console.log('Using WalletConnect Project ID:', maskedId);
+// Only log if we have a valid project ID
+if (typeof window !== 'undefined' && projectId) {
+  const maskedId = `${projectId.substring(0, 4)}...${projectId.substring(projectId.length - 4)}`;
+  console.log('✅ Using WalletConnect Project ID:', maskedId);
 }
 
 // Setup wagmi adapter with correct type handling
 export const wagmiAdapter = new WagmiAdapter({
   networks: [seiTestnet] as AppKitNetwork[],
-  projectId
+  projectId: projectId || 'fallback' // Provide fallback to prevent crashes
 });
 
-// Create modal with proper type handling
-export const modal = createAppKit({
+// Create modal with proper type handling only if we have a project ID
+export const modal = projectId ? createAppKit({
   adapters: [wagmiAdapter],
   networks: [seiTestnet] as unknown as [AppKitNetwork, ...AppKitNetwork[]],
   metadata: {
@@ -108,9 +113,9 @@ export const modal = createAppKit({
     '--w3m-accent': '#8B5CF6',
   },
   features: {
-    analytics: true
+    analytics: !!projectId // Only enable analytics if we have a valid project ID
   }
-});
+}) : null;
 
 // Re-export hooks from @reown/appkit/react
 export {

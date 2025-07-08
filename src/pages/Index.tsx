@@ -3,7 +3,7 @@ import React, { Suspense, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
 import LandingPage from '@/components/LandingPage';
-import PortfolioOverview from '@/components/PortfolioOverview';
+import PortfolioOverview from '@/components/PortfolioOverview_enhanced';
 import TokenTable from '@/components/TokenTable';
 import PerformanceChart from '@/components/PerformanceChart';
 import AIChat from '@/components/AIChat';
