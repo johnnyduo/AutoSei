@@ -121,7 +121,7 @@ const AllocationAdjuster = () => {
               max={100}
               step={1}
               onValueChange={(value) => handleSliderChange(item.id, value[0])}
-              className="[&>span:first-child]:bg-gradient-to-r [&>span:first-child]:from-nebula-600 [&>span:first-child]:to-nebula-400"
+              className="[&>span:first-child]:bg-gradient-orange-coral"
             />
           </div>
         ))}

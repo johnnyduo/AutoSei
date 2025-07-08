@@ -144,7 +144,7 @@ For questions, feedback, or contributions, please open an issue or contact the m
 Try AutoSei: [https://autosei.xyz](https://autosei.xyz)
 
 ## Screenshots
-![AutoSei Dashboard](https://github.com/user-attachments/assets/1c55d6c2-a148-45a3-a9e2-ed7b0be309dd)
+
 
 ## Team
 

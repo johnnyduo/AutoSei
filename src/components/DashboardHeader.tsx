@@ -102,7 +102,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-nebula-600 to-nebula-400 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-gradient-orange-coral text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
               onClick={() => setShowAIDocumentation(true)}
             >
               <Bot className="h-4 w-4 mr-2" />
@@ -122,7 +122,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-gradient-to-r from-orange-500 to-coral-500 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
               onClick={handleAddNetwork}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -142,7 +142,7 @@ const DashboardHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-blue-500 to-cyan-400 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
+              className="bg-gradient-to-r from-coral-500 to-burgundy-500 text-white border-none hover:opacity-90 w-full md:w-auto justify-start md:justify-center"
               onClick={handleFaucetClick}
             >
               <Droplets className="h-4 w-4 mr-2" />
@@ -161,7 +161,7 @@ const DashboardHeader = () => {
     <>
       <div className="flex items-center justify-between py-6 px-4 md:px-8">
         <div className="flex items-center space-x-3">
-          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center animate-pulse-glow">
+          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-burgundy-500 flex items-center justify-center animate-pulse-glow">
             <span className="font-space text-white text-2xl font-bold">A</span>
           </div>
           <h1 className="text-3xl font-bold font-space cosmic-text">AutoSei</h1>

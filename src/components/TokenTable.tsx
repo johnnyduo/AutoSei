@@ -435,7 +435,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                     >
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className="h-8 w-8 rounded-full bg-gradient-nebula flex items-center justify-center">
+                          <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center">
                             <span className="font-medium text-xs">{token.symbol.substring(0, 2)}</span>
                           </div>
                           <div>
@@ -533,7 +533,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
               <DialogTitle className="flex items-center">
                 {selectedToken && (
                   <>
-                    <div className="h-8 w-8 rounded-full bg-gradient-nebula flex items-center justify-center mr-2">
+                    <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center mr-2">
                       <span className="font-medium text-xs">{selectedToken.symbol.substring(0, 2)}</span>
                     </div>
                     {selectedToken.name} ({selectedToken.symbol}) Insights

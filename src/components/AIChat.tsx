@@ -613,7 +613,7 @@ const AIChat = () => {
                   <div className={`max-w-[80%] ${msg.sender === 'user' ? 'bg-nebula-800' : 'bg-cosmic-700'} rounded-2xl p-4`}>
                     <div className="flex items-center mb-2">
                       <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                        msg.sender === 'user' ? 'bg-nebula-600' : 'bg-gradient-nebula'
+                        msg.sender === 'user' ? 'bg-orange-500' : 'bg-gradient-orange-coral'
                       }`}>
                         {msg.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                       </div>
@@ -647,7 +647,7 @@ const AIChat = () => {
                 <div className="flex justify-start">
                   <div className="bg-cosmic-700 rounded-2xl p-4 max-w-[80%]">
                     <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-gradient-nebula flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-gradient-orange-coral flex items-center justify-center">
                         <Bot className="h-4 w-4" />
                       </div>
                       <span className="ml-2 font-medium">AutoSei Assistant</span>

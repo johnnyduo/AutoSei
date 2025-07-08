@@ -44,7 +44,7 @@ const WalletConnectWrapper = () => {
     <Button
       variant="outline"
       size="sm"
-      className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-none hover:opacity-90"
+      className="bg-gradient-orange-coral text-white border-none hover:opacity-90"
       onClick={handleDisconnect}
     >
       <span className="font-mono">{formatAddress(address)}</span>

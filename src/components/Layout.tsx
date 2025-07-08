@@ -31,7 +31,7 @@ const Layout = ({ children }: LayoutProps) => {
             <TabsList className="glass-panel p-1 rounded-xl">
               <TabsTrigger 
                 value="dashboard" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <LayoutDashboard className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="text-xs md:text-sm">Dashboard</span>
@@ -39,7 +39,7 @@ const Layout = ({ children }: LayoutProps) => {
               
               <TabsTrigger 
                 value="bots" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <Bot className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="text-xs md:text-sm">Trading Bots</span>
@@ -47,7 +47,7 @@ const Layout = ({ children }: LayoutProps) => {
               
               <TabsTrigger 
                 value="strategies" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <BarChart2 className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="text-xs md:text-sm">Strategies</span>
@@ -55,7 +55,7 @@ const Layout = ({ children }: LayoutProps) => {
               
               <TabsTrigger 
                 value="chat" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <MessageCircle className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="text-xs md:text-sm">AI Chat</span>
@@ -63,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
               
               <TabsTrigger 
                 value="settings" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nebula-600 data-[state=active]:to-nebula-400 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
               >
                 <Settings className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="text-xs md:text-sm">Settings</span>
