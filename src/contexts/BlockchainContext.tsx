@@ -3,10 +3,9 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { toast } from 'sonner';
-import { updateAllocations, getExplorerUrl } from '../lib/contractService';
+import { updateAllocations, getExplorerUrl, AUTOSEI_PORTFOLIO_CORE_ADDRESS } from '../lib/contractService';
 import AutomatedPortfolioABI from '../abi/AutomatedPortfolio.json';
 import { useContractRead, useWaitForTransactionReceipt } from 'wagmi';
-import { PORTFOLIO_CONTRACT_ADDRESS } from '../lib/contractService';
 
 // Define the default allocations
 const defaultAllocations = [
@@ -70,7 +69,7 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
   
   // Check if the connected wallet is the contract owner
   const { data: ownerAddress, isLoading: isOwnerLoading } = useContractRead({
-    address: PORTFOLIO_CONTRACT_ADDRESS,
+    address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
     abi: AutomatedPortfolioABI,
     functionName: 'owner',
   });
@@ -80,7 +79,7 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
   
   // Use the portfolio allocations hook from contractService
   const { data: contractAllocations, isLoading: isAllocationsLoading, refetch } = useContractRead({
-    address: PORTFOLIO_CONTRACT_ADDRESS,
+    address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
     abi: AutomatedPortfolioABI,
     functionName: 'getAllocations',
   });
@@ -449,7 +448,7 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       transactions,
       addTransaction,
       updateTransaction,
-      contractAddress: PORTFOLIO_CONTRACT_ADDRESS,
+      contractAddress: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
       isContractOwner,
       ownerAddress: ownerAddress as string || null,
       refreshAllocations

@@ -1,0 +1,781 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "AISignalUpdated",
+    "inputs": [
+      {
+        "name": "category",
+        "type": "string",
+        "indexed": false
+      },
+      {
+        "name": "signal",
+        "type": "uint8",
+        "indexed": false
+      },
+      {
+        "name": "confidence",
+        "type": "uint256",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "AllocationUpdated",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "indexed": false
+      },
+      {
+        "name": "percentage",
+        "type": "uint256",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      {
+        "name": "previousOwner",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PortfolioRebalanced",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "newTotalValue",
+        "type": "uint256",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "TradingBotStatusChanged",
+    "inputs": [
+      {
+        "name": "botId",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "isActive",
+        "type": "bool",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UserRegistered",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WhaleActivityDetected",
+    "inputs": [
+      {
+        "name": "whale",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "token",
+        "type": "string",
+        "indexed": false
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "actionType",
+        "type": "uint8",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "aiOracle",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "aiSignals",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "name": "signal",
+        "type": "uint8"
+      },
+      {
+        "name": "confidence",
+        "type": "uint256"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "name": "reasoning",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "authorizeAI",
+    "inputs": [
+      {
+        "name": "_aiAddress",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "authorizedAI",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "botIds",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "categories",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "defaultAllocations",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "defaultCategories",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAllAISignals",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "_categories",
+        "type": "string[]"
+      },
+      {
+        "name": "_signals",
+        "type": "uint8[]"
+      },
+      {
+        "name": "_confidences",
+        "type": "uint256[]"
+      },
+      {
+        "name": "_timestamps",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getActiveTradingBots",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "_botIds",
+        "type": "uint256[]"
+      },
+      {
+        "name": "_names",
+        "type": "string[]"
+      },
+      {
+        "name": "_strategies",
+        "type": "string[]"
+      },
+      {
+        "name": "_performances",
+        "type": "uint256[]"
+      },
+      {
+        "name": "_trades",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getPortfolioSummary",
+    "inputs": [
+      {
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "_totalValue",
+        "type": "uint256"
+      },
+      {
+        "name": "_performanceScore",
+        "type": "uint256"
+      },
+      {
+        "name": "_riskLevel",
+        "type": "uint256"
+      },
+      {
+        "name": "_autoRebalance",
+        "type": "bool"
+      },
+      {
+        "name": "_lastRebalance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getRecentWhaleActivities",
+    "inputs": [
+      {
+        "name": "_limit",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "_whales",
+        "type": "address[]"
+      },
+      {
+        "name": "_tokens",
+        "type": "string[]"
+      },
+      {
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
+        "name": "_actionTypes",
+        "type": "uint8[]"
+      },
+      {
+        "name": "_timestamps",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getSupportedCategories",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTotalUsers",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getUserAllocations",
+    "inputs": [
+      {
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "_categories",
+        "type": "string[]"
+      },
+      {
+        "name": "_percentages",
+        "type": "uint256[]"
+      },
+      {
+        "name": "_isActive",
+        "type": "bool[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "rebalancePortfolio",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "recordWhaleActivity",
+    "inputs": [
+      {
+        "name": "_whale",
+        "type": "address"
+      },
+      {
+        "name": "_token",
+        "type": "string"
+      },
+      {
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "name": "_actionType",
+        "type": "uint8"
+      },
+      {
+        "name": "_priceImpact",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "registerUser",
+    "inputs": [
+      {
+        "name": "_riskLevel",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeAI",
+    "inputs": [
+      {
+        "name": "_aiAddress",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "toggleAutoRebalance",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "tradingBots",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "strategy",
+        "type": "string"
+      },
+      {
+        "name": "isActive",
+        "type": "bool"
+      },
+      {
+        "name": "allocation",
+        "type": "uint256"
+      },
+      {
+        "name": "performance",
+        "type": "uint256"
+      },
+      {
+        "name": "trades",
+        "type": "uint256"
+      },
+      {
+        "name": "lastActive",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "_newOwner",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateAISignal",
+    "inputs": [
+      {
+        "name": "_category",
+        "type": "string"
+      },
+      {
+        "name": "_signal",
+        "type": "uint8"
+      },
+      {
+        "name": "_confidence",
+        "type": "uint256"
+      },
+      {
+        "name": "_reasoning",
+        "type": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateTradingBot",
+    "inputs": [
+      {
+        "name": "_botId",
+        "type": "uint256"
+      },
+      {
+        "name": "_isActive",
+        "type": "bool"
+      },
+      {
+        "name": "_performance",
+        "type": "uint256"
+      },
+      {
+        "name": "_trades",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateUserAllocations",
+    "inputs": [
+      {
+        "name": "_categories",
+        "type": "string[]"
+      },
+      {
+        "name": "_percentages",
+        "type": "uint256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "userAllocations",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "name": "percentage",
+        "type": "uint256"
+      },
+      {
+        "name": "isActive",
+        "type": "bool"
+      },
+      {
+        "name": "lastUpdated",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "userPortfolios",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "totalValue",
+        "type": "uint256"
+      },
+      {
+        "name": "lastRebalance",
+        "type": "uint256"
+      },
+      {
+        "name": "autoRebalance",
+        "type": "bool"
+      },
+      {
+        "name": "riskLevel",
+        "type": "uint256"
+      },
+      {
+        "name": "performanceScore",
+        "type": "uint256"
+      },
+      {
+        "name": "isActive",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "users",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "whaleActivities",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "whale",
+        "type": "address"
+      },
+      {
+        "name": "token",
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "name": "actionType",
+        "type": "uint8"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "name": "priceImpact",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "whaleActivityCount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

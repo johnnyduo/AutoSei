@@ -134,3 +134,48 @@ export const getCachedTokenData = (): { data: TokenPrice[], timestamp: number } 
   
   return { data: [], timestamp: 0 };
 };
+
+/**
+ * Fetch SEI token price specifically
+ */
+export const fetchSeiPrice = async (): Promise<number> => {
+  try {
+    const apiUrl = import.meta.env.VITE_COINGECKO_API_URL || 'https://api.coingecko.com/api/v3';
+    
+    // Try to fetch SEI price from CoinGecko
+    const response = await fetch(
+      `${apiUrl}/simple/price?ids=sei-network&vs_currencies=usd`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data['sei-network'] && data['sei-network'].usd) {
+      return data['sei-network'].usd;
+    }
+    
+    // Fallback: try with symbol search
+    const fallbackResponse = await fetch(
+      `${apiUrl}/coins/markets?vs_currency=usd&ids=sei-network&order=market_cap_desc&per_page=1&page=1`
+    );
+    
+    if (fallbackResponse.ok) {
+      const fallbackData = await fallbackResponse.json();
+      if (fallbackData.length > 0 && fallbackData[0].current_price) {
+        return fallbackData[0].current_price;
+      }
+    }
+    
+    // If all fails, return a reasonable default (you can update this)
+    console.warn('Could not fetch SEI price, using fallback');
+    return 0.45; // Fallback price
+    
+  } catch (error) {
+    console.error('Error fetching SEI price:', error);
+    // Return fallback price on error
+    return 0.45;
+  }
+};
