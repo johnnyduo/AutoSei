@@ -274,14 +274,16 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
       if (isApplying) return;
       onOpenChange(newOpen);
     }}>
-      <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] bg-cosmic-900 border-cosmic-700 max-h-[90vh] overflow-auto">
+      <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] bg-background/95 backdrop-blur-md border border-border/20 max-h-[90vh] overflow-auto">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg" />
+        <div className="relative z-10">
         <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5 text-nebula-400" />
-            Portfolio Rebalance
+          <DialogTitle className="flex items-center text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            <TrendingUp className="mr-2 h-5 w-5 text-primary" />
+            Portfolio Rebalance Suggestion
           </DialogTitle>
-          <DialogDescription>
-            {action?.description || "Adjust your portfolio allocation across different asset categories."}
+          <DialogDescription className="text-muted-foreground">
+            {action?.description || "Review and apply the AI-suggested portfolio changes below."}
           </DialogDescription>
         </DialogHeader>
 
@@ -335,7 +337,7 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
                         ></span>
                         <span className="font-medium">{item.name}</span>
                         {isRecommended && (
-                          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-nebula-500/20 text-nebula-400">
+                          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
                             AI Suggested
                           </span>
                         )}
@@ -365,12 +367,12 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
                 );
               })}
 
-              <div className="flex items-center justify-between pt-4 border-t border-cosmic-700">
-                <span className="font-medium">Total Allocation</span>
-                <span className={`font-roboto-mono font-bold ${total !== 100 ? 'text-red-500' : 'text-green-500'}`}>{total}%</span>
+              <div className="flex items-center justify-between pt-4 border-t border-border/20">
+                <span className="font-medium text-foreground">Total Allocation</span>
+                <span className={`font-roboto-mono font-bold ${total !== 100 ? 'text-destructive' : 'text-green-500'}`}>{total}%</span>
               </div>
               {total !== 100 && (
-                <div className="flex items-center p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400">
+                <div className="flex items-center p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive">
                   <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0" />
                   <p className="text-sm">Total allocation must equal 100%. Please adjust your allocations or use Auto-Balance.</p>
                 </div>
@@ -382,7 +384,7 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
               {/* Portfolio balance summary */}
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Portfolio Changes</h3>
-                <div className="p-4 rounded-md bg-cosmic-800">
+                <div className="p-4 rounded-md bg-card/50 border border-border/20">
                   <div className="grid grid-cols-2 gap-2">
                     {localAllocations.map((item) => {
                       const originalAllocation = allocations.find(a => a.id === item.id);
@@ -424,8 +426,8 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
               {action?.changes && (
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">AI Recommendation</h3>
-                  <div className="p-4 rounded-md bg-nebula-500/10 border border-nebula-500/20">
-                    <h4 className="font-medium text-nebula-400 mb-2">Market Analysis</h4>
+                  <div className="p-4 rounded-md bg-primary/10 border border-primary/20">
+                    <h4 className="font-medium text-primary mb-2">Market Analysis</h4>
                     <p className="text-sm text-muted-foreground mb-3">
                       This rebalancing is based on current market trends and AI analysis:
                     </p>
@@ -451,9 +453,9 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
               {/* Risk assessment */}
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Risk Assessment</h3>
-                <div className="p-4 rounded-md bg-cosmic-800">
+                <div className="p-4 rounded-md bg-card/50 border border-border/20">
                   {total !== 100 ? (
-                    <div className="text-red-400 text-sm">
+                    <div className="text-destructive text-sm">
                       <AlertTriangle className="h-4 w-4 inline-block mr-1" />
                       Invalid allocation total. Please ensure total equals 100%.
                     </div>
@@ -514,6 +516,7 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
             </Button>
           </div>
         </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
