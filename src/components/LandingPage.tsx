@@ -54,59 +54,59 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
   const features = [
     {
       icon: Bot,
-      title: 'AI Trading Bots',
-      description: 'Automated trading strategies powered by advanced AI algorithms',
-      details: 'Deploy intelligent trading bots that analyze market conditions 24/7 and execute trades based on proven strategies.',
+      title: 'AI Portfolio Navigator',
+      description: 'Intelligent portfolio optimization with conversational AI interface',
+      details: 'Get personalized allocation suggestions, risk assessments, and market insights through natural language conversations with our AI assistant.',
       color: 'from-blue-500 to-purple-500'
     },
     {
       icon: TrendingUp,
-      title: 'Portfolio Analytics',
-      description: 'Real-time performance tracking with detailed insights',
-      details: 'Monitor your portfolio performance with comprehensive analytics, risk assessments, and actionable insights.',
+      title: 'Whale Activity Tracker',
+      description: 'Monitor large transactions and market movements in real-time',
+      details: 'Track whale activities, price impacts, and market movements with advanced analytics and predictive insights on the Sei EVM network.',
       color: 'from-green-500 to-emerald-500'
     },
     {
       icon: Shield,
-      title: 'Risk Management',
-      description: 'Advanced security and risk assessment tools',
-      details: 'Protect your investments with sophisticated risk management tools and security protocols.',
+      title: 'Smart Contract Integration',
+      description: 'On-chain portfolio management with automated rebalancing',
+      details: 'Secure smart contract-based portfolio management with 7 asset categories, risk-adjusted allocations, and automated rebalancing.',
       color: 'from-red-500 to-pink-500'
     },
     {
       icon: Star,
-      title: 'Strategy Marketplace',
-      description: 'Discover and deploy proven trading strategies',
-      details: 'Access a curated marketplace of battle-tested trading strategies from experienced traders.',
+      title: 'Trading Strategies Hub',
+      description: 'Access multiple trading strategies and market intelligence',
+      details: 'Deploy various trading strategies including momentum, mean reversion, arbitrage, and yield farming with AI-powered signals.',
       color: 'from-yellow-500 to-orange-500'
     }
   ];
 
   const stats = [
-    { value: '$10M+', label: 'Total Volume Traded' },
-    { value: '500+', label: 'Active Traders' },
-    { value: '25+', label: 'Trading Strategies' },
-    { value: '99.9%', label: 'Uptime' }
+    { value: '50+', label: 'Supported Tokens' },
+    { value: '7', label: 'Asset Categories' },
+    { value: '4+', label: 'Trading Strategies' },
+    { value: 'Sei EVM', label: 'Native Network' }
   ];
 
   const benefits = [
-    'No coding required - user-friendly interface',
-    'Advanced AI algorithms for optimal performance',
-    'Real-time market analysis and insights',
-    'Comprehensive risk management tools',
-    'Transparent fee structure with no hidden costs',
-    '24/7 customer support and community'
+    'Conversational AI interface - no technical expertise required',
+    'On-chain portfolio management with smart contracts',
+    'Real-time whale activity monitoring and market insights',
+    'Multi-strategy trading with risk-adjusted allocations',
+    '7 asset categories: AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin',
+    'Powered by Google Gemini 2.5 Pro and SeiTrace integration'
   ];
 
   return (
     <>
       <Helmet>
-        <title>AutoSei - AI-Powered DeFi Trading Platform for Sei EVM</title>
+        <title>AutoSei - AI-Powered DeFi Portfolio Navigator for Sei EVM</title>
         <meta 
           name="description" 
-          content="Revolutionary AI-powered DeFi investment platform for Sei EVM network. Automated trading, portfolio management, and advanced analytics." 
+          content="Intelligent DeFi portfolio navigator for Sei EVM network. AI-powered portfolio management, whale tracking, and conversational interface for optimal DeFi investments." 
         />
-        <meta name="keywords" content="DeFi, Sei EVM, AI trading, portfolio management, automated trading, cryptocurrency" />
+        <meta name="keywords" content="DeFi, Sei EVM, AI portfolio, whale tracker, portfolio management, smart contracts, cryptocurrency navigation" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Helmet>
 
@@ -135,7 +135,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 <Button 
                   onClick={handleLaunchApp} 
                   disabled={isLoading}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary hover:scale-105 transition-all"
+                  className="neuro-button hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
@@ -163,20 +163,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 Powered by AI on Sei EVM Network
               </Badge>
               <h1 className="text-5xl md:text-7xl font-bold mb-6 cosmic-text">
-                The Future of
+                AI-Powered DeFi
                 <br />
-                DeFi Trading
+                Portfolio Navigator
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Experience the next generation of decentralized finance with AI-powered trading bots, 
-                advanced portfolio management, and real-time market analytics on the Sei EVM network.
+                Navigate the Sei EVM ecosystem with intelligent portfolio management, whale tracking, 
+                and conversational AI. Optimize your DeFi investments with smart contract automation 
+                and real-time market intelligence.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Button 
                   size="lg" 
                   onClick={handleLaunchApp}
                   disabled={isLoading}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
+                  className="neuro-button text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
@@ -186,7 +187,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   ) : (
                     <>
                       <Rocket className="w-5 h-5 mr-2" />
-                      Launch Trading Platform
+                      Launch Portfolio Navigator
                       <ChevronRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -219,9 +220,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
         <section className="py-20 bg-muted/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Powerful Features</h2>
+              <h2 className="text-4xl font-bold mb-4">Intelligent DeFi Features</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to succeed in DeFi trading, powered by cutting-edge AI technology
+                Comprehensive tools for navigating the Sei EVM ecosystem with AI-powered insights and automation
               </p>
             </div>
             
@@ -231,8 +232,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 {features.map((feature, index) => (
                   <Card 
                     key={index}
-                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg border border-border ${
-                      activeFeature === index ? 'ring-2 ring-primary shadow-lg bg-accent/50' : 'hover:ring-1 hover:ring-primary/50'
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                      activeFeature === index ? 'ring-2 ring-primary shadow-lg' : 'hover:ring-1 hover:ring-primary/50'
                     }`}
                     onClick={() => setActiveFeature(index)}
                   >
@@ -266,19 +267,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                    <span className="text-sm">AI Analysis</span>
+                    <span className="text-sm">AI Assistant</span>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Active</span>
+                      <span className="text-sm font-medium">Online</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                    <span className="text-sm">Risk Assessment</span>
-                    <Badge variant="secondary">Low Risk</Badge>
+                    <span className="text-sm">Portfolio Health</span>
+                    <Badge variant="secondary">Optimized</Badge>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                    <span className="text-sm">Performance</span>
-                    <span className="text-sm font-medium text-green-500">+24.5%</span>
+                    <span className="text-sm">Whale Activity</span>
+                    <span className="text-sm font-medium text-blue-500">Monitoring</span>
                   </div>
                 </div>
               </div>
@@ -293,7 +294,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4">Why Choose AutoSei?</h2>
                 <p className="text-xl text-muted-foreground">
-                  Built for traders, by traders. Experience the advantages of our platform.
+                  Built for the Sei EVM ecosystem with cutting-edge AI and blockchain technology.
                 </p>
               </div>
               
@@ -313,9 +314,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
         <section className="py-20 bg-gradient-banner text-white">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-4xl font-bold mb-6">Ready to Start Trading?</h2>
+              <h2 className="text-4xl font-bold mb-6">Ready to Navigate DeFi?</h2>
               <p className="text-xl mb-8 opacity-90">
-                Join thousands of traders who trust AutoSei for their DeFi investment needs.
+                Join the next generation of intelligent DeFi portfolio management on Sei EVM.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
@@ -332,7 +333,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   ) : (
                     <>
                       <Zap className="w-5 h-5 mr-2" />
-                      Launch Platform Now
+                      Launch Navigator Now
                     </>
                   )}
                 </Button>
@@ -340,7 +341,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   size="lg" 
                   variant="outline" 
                   onClick={() => handleSocialClick('discord')}
-                  className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground text-lg px-8 py-6 transition-all duration-300 font-semibold"
+                  className="border-white text-white hover:bg-white/10 text-lg px-8 py-6 transition-colors"
                 >
                   <Users className="w-5 h-5 mr-2" />
                   Join Community
@@ -361,7 +362,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 <span className="text-xl font-bold cosmic-text">AutoSei</span>
               </div>
               <p className="text-muted-foreground mb-6">
-                AI-powered DeFi trading platform for the Sei EVM network
+                AI-powered DeFi portfolio navigator for the Sei EVM network
               </p>
               <div className="flex justify-center gap-6 mb-6">
                 <Button 
@@ -392,7 +393,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
               <p className="text-sm text-muted-foreground">
                 © 2025 AutoSei. All rights reserved. 
                 <br />
-                All trading involves risk. Never invest more than you can afford to lose.
+                DeFi investments carry risk. Always do your own research and never invest more than you can afford to lose.
               </p>
             </div>
           </div>
