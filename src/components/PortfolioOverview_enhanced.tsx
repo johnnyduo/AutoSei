@@ -13,8 +13,6 @@ import {
   useUSDCInfo,
   useUSDCFaucet,
   formatUSDCAmount,
-  categoryColors,
-  categoryNames,
   formatAllocationsForUI
 } from '@/lib/contractService';
 import { useAccount, useBalance, useChainId } from 'wagmi';
@@ -81,9 +79,9 @@ const PortfolioOverview = () => {
   const { data: supportedCategories } = useSupportedCategories();
   
   // Process real allocations from contract with fallback to default allocations
-  const allocations = userAllocations?.categories && userAllocations?.percentages && userAllocations.categories.length > 0 ? 
-    formatAllocationsForUI(userAllocations.categories, userAllocations.percentages) : 
-    [
+  const allocations = (() => {
+    // Default 6 categories that should always be shown
+    const defaultCategories = [
       { id: 'bigcap', name: 'Big Cap', color: '#10B981', allocation: 25 },
       { id: 'ai', name: 'AI & DeFi', color: '#8B5CF6', allocation: 20 },
       { id: 'defi', name: 'DeFi', color: '#F59E0B', allocation: 20 },
@@ -91,6 +89,23 @@ const PortfolioOverview = () => {
       { id: 'rwa', name: 'RWA', color: '#0EA5E9', allocation: 12 },
       { id: 'meme', name: 'Meme & NFT', color: '#EC4899', allocation: 8 }
     ];
+    
+    // If we have contract data, use it but ensure all 6 categories are present
+    if (userAllocations?.categories && userAllocations?.percentages && userAllocations.categories.length > 0) {
+      const contractAllocations = formatAllocationsForUI(userAllocations.categories, userAllocations.percentages);
+      
+      // Merge contract data with defaults, giving priority to contract data
+      const mergedAllocations = defaultCategories.map(defaultCategory => {
+        const contractCategory = contractAllocations.find(c => c.id === defaultCategory.id);
+        return contractCategory || { ...defaultCategory, allocation: 0 }; // Set missing categories to 0%
+      });
+      
+      return mergedAllocations;
+    }
+    
+    // Fallback to defaults if no contract data
+    return defaultCategories;
+  })();
   
   // Calculate real portfolio metrics
   const seiBalance = balanceData ? parseFloat(balanceData.formatted) : 0;
@@ -106,9 +121,6 @@ const PortfolioOverview = () => {
   
   // Real performance from contract - Convert BigInt values to numbers
   const performanceScore = portfolioSummary?.performanceScore ? Number(portfolioSummary.performanceScore) : 0;
-  const riskLevel = portfolioSummary?.riskLevel ? Number(portfolioSummary.riskLevel) : 0;
-  const autoRebalanceEnabled = portfolioSummary?.autoRebalance || false;
-  const lastRebalance = portfolioSummary?.lastRebalance ? Number(portfolioSummary.lastRebalance) : 0;
   
   // Convert contract allocations to token holdings with enhanced data
   const tokenHoldings: TokenHolding[] = allocations.map((allocation) => ({
@@ -159,36 +171,6 @@ const PortfolioOverview = () => {
     loadSeiPrice();
     setIsGeminiEnabled(typeof isGeminiAvailable === 'function' ? isGeminiAvailable() : false);
   }, []); // Empty dependency array - only run once on mount
-
-  // Check contract configuration on mount
-  useEffect(() => {
-    // Debug contract configuration using actual .env values
-    const mockUSDCAddress = import.meta.env.VITE_MOCK_USDC_ADDRESS;
-    console.log('🔧 Contract Configuration Debug:', {
-      VITE_MOCK_USDC_ADDRESS: mockUSDCAddress,
-      fromEnv: '0x9d5F1273002Cc4DAC76B72249ed59B21Ba41D526', // Expected from .env
-      isConnected,
-      address,
-      chainId,
-      expectedChainId: 1328, // Sei Testnet Chain ID
-      chainName: chainId === 1328 ? 'Sei Testnet' : `Unknown Chain (${chainId})`,
-      hasEthereum: typeof window !== 'undefined' && !!window.ethereum,
-      walletConnectProjectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID
-    });
-
-    if (!mockUSDCAddress || mockUSDCAddress === '0x0000000000000000000000000000000000000000') {
-      console.warn('⚠️ MOCK_USDC_ADDRESS not configured properly');
-      console.log('💡 Expected: 0x9d5F1273002Cc4DAC76B72249ed59B21Ba41D526');
-    } else {
-      console.log('✅ USDC contract address is configured:', mockUSDCAddress);
-    }
-
-    if (isConnected && chainId !== 1328) {
-      console.warn('⚠️ Not connected to Sei Testnet. Current chain:', chainId);
-    } else if (isConnected) {
-      console.log('✅ Connected to Sei Testnet');
-    }
-  }, [isConnected, address, chainId]);
 
   // Enhanced token insights function
   const getTokenInsights = async (token: TokenHolding) => {
@@ -264,14 +246,6 @@ const PortfolioOverview = () => {
     }
 
     try {
-      console.log('🚀 Attempting to claim USDC faucet...', {
-        address,
-        currentBalance: usdcBalanceNumber,
-        contractAddress: mockUSDCAddress,
-        chainId,
-        networkName: 'Sei Testnet'
-      });
-
       const result = await claimFaucet();
       
       toast({
@@ -279,12 +253,9 @@ const PortfolioOverview = () => {
         description: "100 USDC has been added to your wallet. It may take a moment to appear in your balance.",
       });
       
-      console.log('✅ USDC faucet claim successful:', result);
-      
       // Refresh USDC balance after a delay to allow transaction to confirm
       setTimeout(() => {
         refetchUSDC();
-        console.log('🔄 Refreshing USDC balance after faucet claim');
       }, 5000);
       
     } catch (error) {
@@ -508,7 +479,6 @@ const PortfolioOverview = () => {
                 isAIActive ? 'text-purple-600 dark:text-purple-400' : 'text-muted-foreground'
               }`}>
                 Active Categories: {activeCategories}/{totalCategories}
-                {!userAllocations && <span className="ml-2 text-blue-400">(Demo Mode)</span>}
                 {isAIActive && (
                   <span className="ml-2 inline-flex items-center">
                     <Zap className="h-3 w-3 mr-1" />
@@ -527,7 +497,6 @@ const PortfolioOverview = () => {
               <CardTitle className="text-xl">Asset Allocation</CardTitle>
               <CardDescription>
                 Your portfolio allocation across different asset categories
-                {!userAllocations && <span className="text-blue-400 ml-2">• Demo Mode</span>}
               </CardDescription>
             </div>
             <Button 
@@ -631,9 +600,6 @@ const PortfolioOverview = () => {
                             <div className="text-2xl font-bold text-foreground">
                               {formatCurrency(totalPortfolioValue)}
                             </div>
-                            {!userAllocations && (
-                              <div className="text-xs text-blue-400 mt-1">Demo Mode</div>
-                            )}
                           </>
                         )}
                       </div>
@@ -647,7 +613,6 @@ const PortfolioOverview = () => {
                     <h3 className="text-lg font-semibold mb-2">Asset Breakdown</h3>
                     <div className="text-sm text-muted-foreground">
                       {activeCategories} categories • {formatCurrency(totalPortfolioValue)} total
-                      {!userAllocations && <span className="text-blue-400 ml-2">• Using default allocations</span>}
                     </div>
                   </div>
                   

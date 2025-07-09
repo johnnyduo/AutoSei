@@ -22,8 +22,7 @@ import {
   Info,
   Filter,
   RefreshCw,
-  ExternalLink,
-  Settings
+  ExternalLink
 } from 'lucide-react';
 import { whaleTrackerService, WhaleTransaction, WhaleInsight, WhaleAlerts, TokenWhaleAnalysis } from '../services/whaleTrackerService';
 
@@ -37,48 +36,40 @@ const WhaleTracker: React.FC = () => {
   const [recentTransactions, setRecentTransactions] = useState<WhaleTransaction[]>([]);
   const [insights, setInsights] = useState<WhaleInsight[]>([]);
   const [tokenAnalysis, setTokenAnalysis] = useState<TokenWhaleAnalysis | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'insights' | 'analysis'>('overview');
   const [filterType, setFilterType] = useState<'all' | 'critical' | 'high' | 'medium'>('all');
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [hasLoadedData, setHasLoadedData] = useState(false);
-  const [showThresholdConfig, setShowThresholdConfig] = useState(false);
-  const [thresholds, setThresholds] = useState(whaleTrackerService.getWhaleThresholds());
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
-    // Only load data when component first mounts and we haven't loaded data yet
-    if (!hasLoadedData) {
-      loadWhaleData();
-    }
+    loadWhaleData();
     
-    if (autoRefresh && hasLoadedData) {
-      const interval = setInterval(loadWhaleData, 60000); // Refresh every 60 seconds (reduced frequency)
+    if (autoRefresh) {
+      const interval = setInterval(loadWhaleData, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [autoRefresh, hasLoadedData]);
+  }, [autoRefresh]);
 
   const loadWhaleData = async () => {
     try {
       setLoading(true);
       
-      // Load data sequentially to avoid hitting rate limits
-      const alerts = await whaleTrackerService.getWhaleAlerts();
+      const [alerts, transactions, whaleInsights] = await Promise.all([
+        whaleTrackerService.getWhaleAlerts(),
+        whaleTrackerService.getRecentWhaleTransactions(50),
+        whaleTrackerService.getWhaleInsights(),
+      ]);
+
       setWhaleAlerts(alerts);
-      
-      const transactions = await whaleTrackerService.getRecentWhaleTransactions(20); // Reduced from 50
       setRecentTransactions(transactions);
-      
-      const whaleInsights = await whaleTrackerService.getWhaleInsights();
       setInsights(whaleInsights);
 
-      // Only load token analysis if we have a valid address and haven't loaded it recently
+      // Load token analysis for USDC
       const usdcAddress = (import.meta as any).env.VITE_MOCK_USDC_ADDRESS;
-      if (usdcAddress && !tokenAnalysis) {
+      if (usdcAddress) {
         const analysis = await whaleTrackerService.getTokenWhaleAnalysis(usdcAddress);
         setTokenAnalysis(analysis);
       }
-      
-      setHasLoadedData(true);
     } catch (error) {
       console.error('Error loading whale data:', error);
     } finally {
@@ -130,12 +121,6 @@ const WhaleTracker: React.FC = () => {
     return `$${amount.toFixed(2)}`;
   };
 
-  const updateThresholds = (newThresholds: Partial<typeof thresholds>) => {
-    const updated = { ...thresholds, ...newThresholds };
-    setThresholds(updated);
-    whaleTrackerService.setWhaleThresholds(updated);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -150,112 +135,25 @@ const WhaleTracker: React.FC = () => {
               <div className={`w-2 h-2 rounded-full ${whaleTrackerService.isUsingMockData() ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
               <span>{whaleTrackerService.getApiKeyStatus()}</span>
             </div>
-            {!whaleTrackerService.isUsingMockData() && (
-              <div className="text-xs text-muted-foreground">
-                •{' '}
-                {(() => {
-                  const status = whaleTrackerService.getRateLimitStatus();
-                  return `${status.requestsRemaining}/${status.requestsUsed + status.requestsRemaining} requests`;
-                })()}
-              </div>
-            )}
           </div>
           
           <button
-            onClick={() => setShowThresholdConfig(!showThresholdConfig)}
-            className="p-2 rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            title="Configure whale thresholds"
-          >
-            <Settings className="h-4 w-4" />
-          </button>
-          
-          <button
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`p-2 rounded-lg ${autoRefresh ? 'bg-green-100 text-green-600 dark:bg-green-900/20' : 'bg-gray-100 text-gray-600 dark:bg-gray-700'} hover:bg-opacity-80 transition-colors`}
-            title={autoRefresh ? 'Auto-refresh enabled (60s)' : 'Auto-refresh disabled'}
+            className={`p-2 rounded-lg ${autoRefresh ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'} hover:bg-opacity-80 transition-colors`}
           >
-            <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-pulse' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
           </button>
           
           <button
             onClick={loadWhaleData}
             disabled={loading}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
-            title="Manually refresh data"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>{loading ? 'Loading...' : 'Refresh'}</span>
+            <span>Refresh</span>
           </button>
         </div>
       </div>
-
-      {/* Threshold Configuration Panel */}
-      {showThresholdConfig && (
-        <Card className="glass-panel">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Settings className="h-5 w-5" />
-              <span>Whale Threshold Configuration</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm text-muted-foreground">Small Whale ($)</label>
-                <input
-                  type="number"
-                  value={thresholds.small}
-                  onChange={(e) => updateThresholds({ small: Number(e.target.value) })}
-                  className="w-full mt-1 px-3 py-2 border rounded-lg bg-background text-sm"
-                  min="1000"
-                  step="1000"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">Medium Whale ($)</label>
-                <input
-                  type="number"
-                  value={thresholds.medium}
-                  onChange={(e) => updateThresholds({ medium: Number(e.target.value) })}
-                  className="w-full mt-1 px-3 py-2 border rounded-lg bg-background text-sm"
-                  min="10000"
-                  step="10000"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">Large Whale ($)</label>
-                <input
-                  type="number"
-                  value={thresholds.large}
-                  onChange={(e) => updateThresholds({ large: Number(e.target.value) })}
-                  className="w-full mt-1 px-3 py-2 border rounded-lg bg-background text-sm"
-                  min="100000"
-                  step="100000"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">Mega Whale ($)</label>
-                <input
-                  type="number"
-                  value={thresholds.mega}
-                  onChange={(e) => updateThresholds({ mega: Number(e.target.value) })}
-                  className="w-full mt-1 px-3 py-2 border rounded-lg bg-background text-sm"
-                  min="1000000"
-                  step="1000000"
-                />
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>Current minimum whale transaction:</strong> ${whaleTrackerService.getMinWhaleTransaction().toLocaleString()}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Transactions below this amount will not be considered whale activity.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -265,7 +163,6 @@ const WhaleTracker: React.FC = () => {
               <div>
                 <p className="text-green-100 text-sm">Large Transfers</p>
                 <p className="text-2xl font-bold">{whaleAlerts.largeTransfers.length}</p>
-                <p className="text-xs text-green-200 opacity-75">≥${(thresholds.small / 1000).toFixed(0)}K</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-200" />
             </div>
@@ -309,44 +206,10 @@ const WhaleTracker: React.FC = () => {
         </Card>
       </div>
 
-      {/* Show loading state if no data has been loaded yet */}
-      {!hasLoadedData && loading && (
-        <Card className="glass-panel">
-          <CardContent className="p-12">
-            <div className="text-center">
-              <RefreshCw className="h-12 w-12 mx-auto mb-4 animate-spin text-primary" />
-              <h3 className="text-lg font-semibold mb-2">Loading Whale Data</h3>
-              <p className="text-muted-foreground">Fetching latest whale activity and insights...</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Show empty state if no data and not loading */}
-      {!hasLoadedData && !loading && (
-        <Card className="glass-panel">
-          <CardContent className="p-12">
-            <div className="text-center">
-              <Waves className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">No Whale Data Loaded</h3>
-              <p className="text-muted-foreground mb-4">Click the refresh button to load whale activity data</p>
-              <button
-                onClick={loadWhaleData}
-                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 flex items-center space-x-2 mx-auto"
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span>Load Data</span>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Navigation Tabs - Only show when data is loaded */}
-      {hasLoadedData && (
-        <Card className="glass-panel">
-          <div className="flex flex-wrap gap-2 p-4 border-b">
-            {[
+      {/* Navigation Tabs */}
+      <Card className="glass-panel">
+        <div className="flex flex-wrap gap-2 p-4 border-b">
+          {[
             { id: 'overview', label: 'Overview', icon: Eye },
             { id: 'transactions', label: 'Transactions', icon: Activity },
             { id: 'insights', label: 'AI Insights', icon: Brain },
@@ -366,13 +229,10 @@ const WhaleTracker: React.FC = () => {
             </button>
           ))}
         </div>
-        </Card>
-      )}
+      </Card>
 
-      {/* Content - Only show when data is loaded */}
-      {hasLoadedData && (
-        <>
-          {activeTab === 'overview' && (
+      {/* Content */}
+      {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Large Transfers */}
           <Card className="glass-panel">
@@ -760,8 +620,6 @@ const WhaleTracker: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-      )}
-        </>
       )}
     </div>
   );

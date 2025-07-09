@@ -179,9 +179,9 @@ const AdjustmentModal = ({ open, onOpenChange, action }: AdjustmentModalProps) =
       return;
     }
     
-    if (total !== 100) {
+    if (Math.abs(total - 100) > 0.01) { // Allow small floating point differences
       toast.error("Invalid Allocation", {
-        description: "Total allocation must equal 100%"
+        description: `Total allocation must equal 100%. Current total: ${total.toFixed(2)}%`
       });
       return;
     }

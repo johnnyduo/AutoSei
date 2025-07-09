@@ -85,7 +85,11 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
   const { data: contractAllocations, isLoading: isAllocationsLoading, refetch } = useContractRead({
     address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
     abi: AutoSeiPortfolioCoreABI,
-    functionName: 'getAllocations',
+    functionName: 'getUserAllocations',
+    args: [address],
+    query: {
+      enabled: !!address && AUTOSEI_PORTFOLIO_CORE_ADDRESS !== '0x0000000000000000000000000000000000000000',
+    }
   });
 
   // State for allocations
@@ -143,12 +147,12 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
   
   // Process contract allocations data
   useEffect(() => {
-    if (contractAllocations) {
+    if (contractAllocations && address) {
       try {
-        const [categories, percentages] = contractAllocations as [string[], bigint[]];
+        const [categories, percentages, isActive] = contractAllocations as [string[], bigint[], boolean[]];
         
         if (Array.isArray(categories) && Array.isArray(percentages) && categories.length === percentages.length) {
-          const newAllocations = categories.map((category, index) => {
+          const contractAllocations = categories.map((category, index) => {
             // Find matching default allocation for color and name
             const defaultAllocation = defaultAllocations.find(a => a.id === category);
             
@@ -160,17 +164,21 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
             };
           });
           
-          console.log('Received contract allocations:', newAllocations);
+          // Merge with default allocations to ensure all 6 categories are present
+          const mergedAllocations = defaultAllocations.map(defaultCategory => {
+            const contractCategory = contractAllocations.find(c => c.id === defaultCategory.id);
+            return contractCategory || { ...defaultCategory, allocation: 0 }; // Set missing categories to 0%
+          });
           
           // Update state and localStorage
-          setAllocations(newAllocations);
-          localStorage.setItem(ALLOCATIONS_STORAGE_KEY, JSON.stringify(newAllocations));
+          setAllocations(mergedAllocations);
+          localStorage.setItem(ALLOCATIONS_STORAGE_KEY, JSON.stringify(mergedAllocations));
         }
       } catch (error) {
         console.error('Error processing contract allocations:', error);
       }
     }
-  }, [contractAllocations]);
+  }, [contractAllocations, address]);
   
   // Handle transaction confirmation
   useEffect(() => {
@@ -278,22 +286,43 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
     
     // Validate total allocation is 100%
     const total = allocationsToSubmit.reduce((sum, item) => sum + item.allocation, 0);
-    if (total !== 100) {
+    if (Math.abs(total - 100) > 0.01) { // Allow small floating point differences
       toast({
         title: "Invalid Allocation",
-        description: `Total allocation must be 100%. Current total: ${total}%`,
+        description: `Total allocation must be 100%. Current total: ${total.toFixed(2)}%`,
         variant: "destructive"
       });
       return false;
     }
     
+    // Filter out 0% allocations and normalize to ensure exactly 100%
+    const nonZeroAllocations = allocationsToSubmit.filter(item => item.allocation > 0);
+    const nonZeroTotal = nonZeroAllocations.reduce((sum, item) => sum + item.allocation, 0);
+    
+    // Normalize to exactly 100% if needed
+    if (Math.abs(nonZeroTotal - 100) > 0.01) {
+      const factor = 100 / nonZeroTotal;
+      nonZeroAllocations.forEach(item => {
+        item.allocation = Math.round(item.allocation * factor);
+      });
+      
+      // Adjust for rounding errors
+      const adjustedTotal = nonZeroAllocations.reduce((sum, item) => sum + item.allocation, 0);
+      if (adjustedTotal !== 100) {
+        const diff = 100 - adjustedTotal;
+        nonZeroAllocations[0].allocation += diff; // Add the difference to the first allocation
+      }
+    }
+    
+    console.log('Final allocations to submit:', nonZeroAllocations);
+    
     // Check if there are actual changes compared to current allocations
     let hasChanges = false;
     console.log('Checking for changes between:');
     console.log('Current:', allocations);
-    console.log('To Submit:', allocationsToSubmit);
+    console.log('To Submit:', nonZeroAllocations);
     
-    for (const newAlloc of allocationsToSubmit) {
+    for (const newAlloc of nonZeroAllocations) {
       const currentAlloc = allocations.find(a => a.id === newAlloc.id);
       if (!currentAlloc) {
         console.log(`New allocation found: ${newAlloc.id} with ${newAlloc.allocation}%`);
@@ -301,6 +330,17 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       } else if (currentAlloc.allocation !== newAlloc.allocation) {
         console.log(`Change detected for ${newAlloc.id}: ${currentAlloc.allocation}% -> ${newAlloc.allocation}%`);
         hasChanges = true;
+      }
+    }
+    
+    // Also check if any current allocations are being removed (set to 0)
+    for (const currentAlloc of allocations) {
+      if (currentAlloc.allocation > 0) {
+        const newAlloc = nonZeroAllocations.find(a => a.id === currentAlloc.id);
+        if (!newAlloc) {
+          console.log(`Allocation being removed: ${currentAlloc.id} (${currentAlloc.allocation}% -> 0%)`);
+          hasChanges = true;
+        }
       }
     }
     
@@ -330,7 +370,7 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
         status: 'pending',
         details: {
           oldAllocations: allocations,
-          newAllocations: allocationsToSubmit
+          newAllocations: nonZeroAllocations
         }
       };
       
@@ -338,14 +378,14 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       addTransaction(pendingTx);
       
       console.log('About to call updateAllocations with:', {
-        categories: allocationsToSubmit.map(a => a.id),
-        percentages: allocationsToSubmit.map(a => a.allocation),
-        total: allocationsToSubmit.reduce((sum, item) => sum + item.allocation, 0)
+        categories: nonZeroAllocations.map(a => a.id),
+        percentages: nonZeroAllocations.map(a => a.allocation),
+        total: nonZeroAllocations.reduce((sum, item) => sum + item.allocation, 0)
       });
       
       try {
         // Call the contract directly using ethers.js
-        const tx = await updateAllocations(allocationsToSubmit);
+        const tx = await updateAllocations(nonZeroAllocations);
         
         if (!tx?.hash) {
           throw new Error('No transaction hash returned');
@@ -359,11 +399,16 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
         // Set the pending hash for monitoring
         setPendingTxHash(tx.hash);
         
-        // Update local state immediately for better UX
-        setAllocations([...allocationsToSubmit]);
+        // Update local state immediately for better UX (but include all 6 categories)
+        const updatedAllocations = defaultAllocations.map(defaultCategory => {
+          const updatedCategory = nonZeroAllocations.find(c => c.id === defaultCategory.id);
+          return updatedCategory || { ...defaultCategory, allocation: 0 };
+        });
+        
+        setAllocations(updatedAllocations);
         
         // Store the updated allocations in localStorage for persistence
-        localStorage.setItem(ALLOCATIONS_STORAGE_KEY, JSON.stringify(allocationsToSubmit));
+        localStorage.setItem(ALLOCATIONS_STORAGE_KEY, JSON.stringify(updatedAllocations));
         
         // Clear pending allocations AFTER we've used them
         setPendingAllocations(null);

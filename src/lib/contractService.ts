@@ -201,17 +201,35 @@ export const updateAllocations = async (allocations: Allocation[]) => {
     const categories = allocations.map(a => a.id);
     const percentages = allocations.map(a => a.allocation);
     
-    console.log('Calling contract with:', {
+    // Validate total is exactly 100
+    const total = percentages.reduce((sum, p) => sum + p, 0);
+    if (total !== 100) {
+      throw new Error(`Total allocation must be exactly 100%, got ${total}%`);
+    }
+    
+    // Filter out any allocations with 0% to avoid contract issues
+    const filteredAllocations = allocations.filter(a => a.allocation > 0);
+    const filteredCategories = filteredAllocations.map(a => a.id);
+    const filteredPercentages = filteredAllocations.map(a => a.allocation);
+    
+    // Validate filtered total is still 100
+    const filteredTotal = filteredPercentages.reduce((sum, p) => sum + p, 0);
+    if (filteredTotal !== 100) {
+      throw new Error(`Filtered allocation total must be exactly 100%, got ${filteredTotal}%`);
+    }
+    
+    console.log('Calling contract with (filtered):', {
       userAddress,
       contractAddress: contractConfig.address,
       contractName: contractConfig.name,
-      categories,
-      percentages
+      categories: filteredCategories,
+      percentages: filteredPercentages,
+      totalPercentage: filteredTotal
     });
     
     // Estimate gas first to check if the transaction will succeed
     try {
-      const gasEstimate = await contract.updateUserAllocations.estimateGas(categories, percentages);
+      const gasEstimate = await contract.updateUserAllocations.estimateGas(filteredCategories, filteredPercentages);
       console.log('Gas estimate:', gasEstimate.toString());
     } catch (gasError) {
       console.error('Gas estimation failed:', gasError);
@@ -219,8 +237,8 @@ export const updateAllocations = async (allocations: Allocation[]) => {
     }
     
     // Call the contract function with explicit gas limit - ethers v6 syntax
-    const tx = await contract.updateUserAllocations(categories, percentages, {
-      gasLimit: 300000 // ethers v6 accepts number directly
+    const tx = await contract.updateUserAllocations(filteredCategories, filteredPercentages, {
+      gasLimit: 500000 // Increased gas limit for more complex operations
     });
     
     console.log('Transaction sent:', tx);
@@ -1227,3 +1245,5 @@ export async function payForStrategy(strategyPrice: number): Promise<{ hash: str
     receipt
   };
 }
+
+
