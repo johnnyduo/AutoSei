@@ -37,7 +37,7 @@ interface Token {
   symbol: string;
   price: number;
   change24h: number;
-  marketCap: number;
+  tvl: number;
   volume: number;
   allocation: number;
   category: string;
@@ -55,31 +55,57 @@ const categoryColors: { [key: string]: string } = {
 
 // Updated token data based on the provided list
 const mockTokens: Token[] = [
-  { id: '1', name: 'PUNKS', symbol: 'PUNK', price: 0.052, change24h: 12.7, marketCap: 32000000, volume: 8700000, allocation: 6, category: 'meme' },
-  { id: '2', name: 'Ambitious Ape Perfume', symbol: 'AAP', price: 0.0084, change24h: 8.3, marketCap: 5600000, volume: 1200000, allocation: 3, category: 'meme' },
-  { id: '3', name: 'Assembly Meme Coin', symbol: 'ASMB', price: 0.0215, change24h: -3.5, marketCap: 12000000, volume: 4300000, allocation: 4, category: 'meme' },
-  { id: '4', name: 'Aureus', symbol: 'AUR', price: 1.26, change24h: 2.4, marketCap: 43000000, volume: 8900000, allocation: 5, category: 'rwa' },
-  { id: '5', name: 'AVAX (LayerZero)', symbol: 'AVAX', price: 28.74, change24h: -1.2, marketCap: 10200000000, volume: 456000000, allocation: 7, category: 'bigcap' },
-  { id: '6', name: 'TelegramBeast Token', symbol: 'BEAST', price: 0.00073, change24h: 32.5, marketCap: 3400000, volume: 890000, allocation: 2, category: 'meme' },
-  { id: '7', name: 'DEEP', symbol: 'DEEP', price: 0.87, change24h: 14.2, marketCap: 28000000, volume: 7600000, allocation: 8, category: 'ai' },
-  { id: '8', name: 'Ether (LayerZero)', symbol: 'ETH', price: 3245.78, change24h: 0.8, marketCap: 389000000000, volume: 15700000000, allocation: 10, category: 'bigcap' },
-  { id: '9', name: 'BigFish', symbol: 'FISH', price: 0.0042, change24h: 42.6, marketCap: 4500000, volume: 2300000, allocation: 3, category: 'meme' },
-  { id: '10', name: 'Fantom (LayerZero)', symbol: 'FTM', price: 0.65, change24h: 5.6, marketCap: 1800000000, volume: 234000000, allocation: 4, category: 'bigcap' },
-  { id: '11', name: 'Fusing Failsafe Token', symbol: 'FUSE', price: 0.31, change24h: 8.4, marketCap: 18000000, volume: 3200000, allocation: 4, category: 'defi' },
-  { id: '12', name: 'HODLHamster', symbol: 'HODLHamster', price: 0.00026, change24h: 78.3, marketCap: 2100000, volume: 750000, allocation: 2, category: 'meme' },
-  { id: '13', name: 'iGold', symbol: 'IPG', price: 1867.45, change24h: 0.4, marketCap: 52000000, volume: 8400000, allocation: 6, category: 'rwa' },
-  { id: '14', name: 'Pothuu (NHU) Token', symbol: 'NHU', price: 0.0064, change24h: 16.8, marketCap: 3900000, volume: 1100000, allocation: 2, category: 'meme' },
-  { id: '15', name: 'LOVE', symbol: 'LOVE', price: 0.0127, change24h: 9.4, marketCap: 7800000, volume: 2100000, allocation: 3, category: 'meme' },
-  { id: '16', name: 'ShimmerSea Lum', symbol: 'LUM', price: 0.42, change24h: 6.7, marketCap: 23000000, volume: 5300000, allocation: 5, category: 'defi' },
-  { id: '17', name: 'Matic (LayerZero)', symbol: 'MATIC', price: 0.56, change24h: -2.3, marketCap: 5600000000, volume: 276000000, allocation: 5, category: 'bigcap' },
-  { id: '18', name: 'ShimmerSea MagicLum', symbol: 'MLUM', price: 0.86, change24h: 11.2, marketCap: 36000000, volume: 9400000, allocation: 5, category: 'defi' },
-  { id: '19', name: 'Wrapped SEI', symbol: 'wSEI', price: 0.45, change24h: 3.6, marketCap: 498000000, volume: 43000000, allocation: 5, category: 'bigcap' },
-  { id: '20', name: 'SEI', symbol: 'SEI', price: 0.45, change24h: 7.5, marketCap: 1530000000, volume: 280000000, allocation: 8, category: 'l1' },
-  { id: '21', name: 'USD Coin (LayerZero)', symbol: 'USDC', price: 1.00, change24h: 0.01, marketCap: 28500000000, volume: 3700000000, allocation: 3, category: 'stablecoin' },
-  { id: '22', name: 'Tether USD (LayerZero)', symbol: 'USDT', price: 1.00, change24h: 0.02, marketCap: 89700000000, volume: 52300000000, allocation: 3, category: 'stablecoin' },
-  { id: '23', name: 'Wrapped BNB (LayerZero)', symbol: 'wBNB', price: 574.23, change24h: -0.8, marketCap: 88600000000, volume: 1860000000, allocation: 4, category: 'bigcap' },
-  { id: '24', name: 'Wrapped Bitcoin (LayerZero)', symbol: 'wBTC', price: 64382.15, change24h: 1.2, marketCap: 125800000000, volume: 4230000000, allocation: 10, category: 'bigcap' },
-  { id: '25', name: 'WEN', symbol: 'WEN', price: 0.00057, change24h: 24.8, marketCap: 4800000, volume: 1320000, allocation: 3, category: 'meme' },
+  { id: '1', name: 'SEI', symbol: 'SEI', price: 0.26, change24h: 2.3, tvl: 35200000, volume: 4500000, allocation: 15, category: 'l1' },
+  { id: '2', name: 'Dragonswap Token', symbol: 'DRG', price: 0.041, change24h: 47.22, tvl: 296731.77, volume: 150000, allocation: 2, category: 'defi' },
+  { id: '2', name: 'Wrapped SEI', symbol: 'WSEI', price: 0.26, change24h: 2.17, tvl: 14369779.25, volume: 3200000, allocation: 8, category: 'l1' },
+  { id: '3', name: 'iSEI', symbol: 'iSEI', price: 0.27, change24h: 2.27, tvl: 5972607.56, volume: 1800000, allocation: 6, category: 'defi' },
+  { id: '4', name: 'USDC', symbol: 'USDC', price: 1, change24h: 0, tvl: 5548483.47, volume: 1600000, allocation: 3, category: 'stablecoin' },
+  { id: '5', name: 'fastUSD', symbol: 'fastUSD', price: 1, change24h: 0, tvl: 4080569.25, volume: 950000, allocation: 3, category: 'stablecoin' },
+  { id: '6', name: 'Synnax Stablecoin', symbol: 'syUSD', price: 1, change24h: -0.28, tvl: 1379011.05, volume: 320000, allocation: 3, category: 'stablecoin' },
+  { id: '7', name: 'Staked fastUSD', symbol: 'sfastUSD', price: 1.01, change24h: -0.07, tvl: 866612.14, volume: 200000, allocation: 3, category: 'stablecoin' },
+  { id: '8', name: 'Wrapped BTC', symbol: 'WBTC', price: 108708.99, change24h: 0.84, tvl: 530062.77, volume: 850000, allocation: 10, category: 'bigcap' },
+  { id: '9', name: 'USD₮0', symbol: 'USDT', price: 1, change24h: 0.2, tvl: 283219.92, volume: 65000, allocation: 3, category: 'stablecoin' },
+  { id: '10', name: 'WETH', symbol: 'WETH', price: 2599.88, change24h: 2.46, tvl: 95178.47, volume: 180000, allocation: 9, category: 'bigcap' },
+  { id: '11', name: 'SEIYAN', symbol: 'SEIYAN', price: 0.0038, change24h: -7.66, tvl: 58886.34, volume: 14000, allocation: 2, category: 'meme' },
+  { id: '12', name: 'MILLI', symbol: 'MILLI', price: 0.05988, change24h: 12.36, tvl: 44648.77, volume: 11000, allocation: 2, category: 'meme' },
+  { id: '13', name: 'Froggy', symbol: 'Frog', price: 0.00013, change24h: 1.25, tvl: 26773.1, volume: 6500, allocation: 2, category: 'meme' },
+  { id: '14', name: 'Popo The Cat', symbol: 'POPO', price: 0.06411, change24h: -1.52, tvl: 19536.47, volume: 4800, allocation: 2, category: 'meme' },
+  { id: '15', name: 'Shenron', symbol: 'SHENRN', price: 0.00035, change24h: -3.83, tvl: 19491.76, volume: 4700, allocation: 2, category: 'meme' },
+  { id: '16', name: 'CHIP$ on SEI', symbol: 'CHIPS', price: 0.00015, change24h: 1.96, tvl: 17976.09, volume: 4200, allocation: 2, category: 'meme' },
+  { id: '17', name: 'xSEIYAN', symbol: 'xSEIYAN', price: 0.0047, change24h: 0, tvl: 9397.05, volume: 2300, allocation: 2, category: 'meme' },
+  { id: '18', name: 'Burger', symbol: 'SUPERSEIZ', price: 0.06326, change24h: 1.11, tvl: 8448.75, volume: 2100, allocation: 2, category: 'meme' },
+  { id: '19', name: 'SEITAN', symbol: 'S8N', price: 0.00018, change24h: 1.36, tvl: 8064.71, volume: 1900, allocation: 2, category: 'meme' },
+  { id: '20', name: 'Master', symbol: 'SENSEI', price: 0.04115, change24h: -11.92, tvl: 7980.64, volume: 1800, allocation: 2, category: 'meme' },
+  { id: '21', name: 'USDT', symbol: 'kavaUSDT', price: 1, change24h: 0, tvl: 7558.24, volume: 1700, allocation: 3, category: 'stablecoin' },
+  { id: '22', name: 'INSPECTOR', symbol: 'REX', price: 0.05981, change24h: 1.23, tvl: 6378.64, volume: 1500, allocation: 2, category: 'meme' },
+  { id: '23', name: 'gonad', symbol: '$gonad', price: 0.04772, change24h: -16.97, tvl: 5514.3, volume: 1300, allocation: 2, category: 'meme' },
+  { id: '24', name: 'SEIFUN', symbol: 'SFN', price: 0.04137, change24h: 29.08, tvl: 4348.01, volume: 1000, allocation: 2, category: 'meme' },
+  { id: '25', name: 'Sei Less', symbol: 'LESS', price: 0.04398, change24h: -8.12, tvl: 4343.81, volume: 950, allocation: 2, category: 'meme' },
+  { id: '26', name: 'Jelly', symbol: 'JELLY', price: 0.04120, change24h: 3.05, tvl: 3558.39, volume: 800, allocation: 2, category: 'meme' },
+  { id: '27', name: 'SEIS AI', symbol: '$SEIS', price: 0.04198, change24h: -1.7, tvl: 3468.42, volume: 750, allocation: 2, category: 'ai' },
+  { id: '28', name: 'Sei Dog', symbol: 'SDOG', price: 0.04111, change24h: 0, tvl: 3262.6, volume: 700, allocation: 2, category: 'meme' },
+  { id: '29', name: 'Seibacca', symbol: 'SBC', price: 0.04295, change24h: -20.7, tvl: 2911.05, volume: 650, allocation: 2, category: 'meme' },
+  { id: '30', name: 'BullionX Herd', symbol: 'BULLX', price: 0.04356, change24h: -19.89, tvl: 2831.37, volume: 600, allocation: 2, category: 'meme' },
+  { id: '31', name: 'Frax Share', symbol: 'FXS', price: 1.91, change24h: 3.49, tvl: 2790.1, volume: 580, allocation: 4, category: 'defi' },
+  { id: '32', name: 'WILSON', symbol: 'WILSON', price: 0.05854, change24h: -2.03, tvl: 2774.3, volume: 550, allocation: 2, category: 'meme' },
+  { id: '33', name: 'Mushvro', symbol: 'VROS', price: 0.29, change24h: 0, tvl: 2754.7, volume: 520, allocation: 3, category: 'meme' },
+  { id: '34', name: 'KOSEI', symbol: 'KOSEI', price: 0.05707, change24h: -15.51, tvl: 2631.74, volume: 500, allocation: 2, category: 'meme' },
+  { id: '35', name: 'NAPCAT', symbol: 'NAPCAT', price: 0.05739, change24h: -4.55, tvl: 1942.93, volume: 450, allocation: 2, category: 'meme' },
+  { id: '36', name: 'LORD SHISHO', symbol: 'SHISHO', price: 0.05275, change24h: -1.72, tvl: 1939.27, volume: 420, allocation: 2, category: 'meme' },
+  { id: '37', name: 'SeiBallz', symbol: 'BALLZ', price: 0.00013, change24h: -28.06, tvl: 1836.46, volume: 400, allocation: 2, category: 'meme' },
+  { id: '38', name: 'UMI', symbol: 'UMI', price: 0.05357, change24h: -1.33, tvl: 1744.89, volume: 380, allocation: 2, category: 'meme' },
+  { id: '39', name: 'Jay jeo', symbol: 'JAYJEO', price: 0.05981, change24h: -0.62, tvl: 1734.29, volume: 360, allocation: 2, category: 'meme' },
+  { id: '40', name: 'WAIT', symbol: 'WAIT', price: 0.05249, change24h: -30.9, tvl: 1519.58, volume: 340, allocation: 2, category: 'meme' },
+  { id: '41', name: 'Happy Ape', symbol: 'HAPE', price: 0.05285, change24h: 0, tvl: 1511.63, volume: 320, allocation: 2, category: 'meme' },
+  { id: '42', name: 'BOOBLE', symbol: 'BOOBLE', price: 0.04110, change24h: 0.89, tvl: 1476.32, volume: 300, allocation: 2, category: 'meme' },
+  { id: '43', name: 'Goku', symbol: 'GOKU', price: 0.05238, change24h: -7.56, tvl: 1420.06, volume: 280, allocation: 2, category: 'meme' },
+  { id: '44', name: 'POCHITA', symbol: 'POCHITA', price: 0.05689, change24h: -27.96, tvl: 1367.86, volume: 260, allocation: 2, category: 'meme' },
+  { id: '45', name: 'OpenSei', symbol: 'OS', price: 0.05203, change24h: 0, tvl: 1361.31, volume: 240, allocation: 2, category: 'defi' },
+  { id: '46', name: 'Spectre AI', symbol: 'SPECTRE', price: 0.05217, change24h: 0, tvl: 1349.77, volume: 220, allocation: 2, category: 'ai' },
+  { id: '47', name: 'WARP', symbol: 'WARP', price: 0.05234, change24h: 0, tvl: 1345.14, volume: 200, allocation: 2, category: 'meme' },
+  { id: '48', name: 'SEIYUN COIN', symbol: 'SEIYUN', price: 0.04172, change24h: -18.13, tvl: 1314.92, volume: 180, allocation: 2, category: 'meme' },
+  { id: '49', name: 'Seiro', symbol: 'SEIRO', price: 0.05338, change24h: -3.17, tvl: 1311.58, volume: 160, allocation: 2, category: 'meme' },
+  { id: '50', name: 'HARD.on.sei', symbol: 'HARD', price: 0.05531, change24h: -2.54, tvl: 1272.81, volume: 140, allocation: 2, category: 'meme' }
 ];
 
 const ITEMS_PER_PAGE = 10;
@@ -250,7 +276,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
           ...token,
           price: liveToken.current_price,
           change24h: liveToken.price_change_percentage_24h,
-          marketCap: liveToken.market_cap,
+          tvl: liveToken.market_cap,
           volume: liveToken.total_volume
         };
       }
@@ -347,11 +373,18 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-2xl">{getCategoryTitle()}</CardTitle>
-              {isGeminiEnabled && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Click on any token to view AI-powered insights
-                </p>
-              )}
+              <div className="flex items-center space-x-4 mt-1">
+                {isGeminiEnabled && (
+                  <p className="text-xs text-muted-foreground">
+                    Click on any token to view AI-powered insights
+                  </p>
+                )}
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <span className="mr-1">Powered by</span>
+                  <span className="font-medium text-[#F97316]">DragonSwap</span>
+                  <span className="ml-1 text-orange-500">🐉</span>
+                </div>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -409,7 +442,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                         <MoveVertical className="ml-1 h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead className="text-right">Market Cap</TableHead>
+                    <TableHead className="text-right">TVL</TableHead>
                     <TableHead className="text-right">Volume (24h)</TableHead>
                     <TableHead className="text-right">
                       <Button 
@@ -465,7 +498,7 @@ const TokenTable = ({ category = "all" }: { category?: string }) => {
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-roboto-mono">
-                        {formatNumber(token.marketCap)}
+                        {formatNumber(token.tvl)}
                       </TableCell>
                       <TableCell className="text-right font-roboto-mono">
                         {formatNumber(token.volume)}
