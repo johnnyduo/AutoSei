@@ -16,7 +16,7 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const [activeTab, setActiveTab] = useState("bots");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const isMobile = useIsMobile();
   
   return (
@@ -25,57 +25,55 @@ const Layout = ({ children }: LayoutProps) => {
       
       <main className="flex-1 container mx-auto py-4 md:py-6 px-2 md:px-4 pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex justify-center mb-4 md:mb-8 overflow-x-auto">
-            <TabsList className="glass-panel p-1 rounded-xl">
+          <div className="flex justify-center mb-6 md:mb-8 overflow-x-auto">
+            <TabsList className="navbar-tabs-container">
               <TabsTrigger 
                 value="dashboard" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <LayoutDashboard className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Dashboard</span>
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Dashboard</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="bots" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <Bot className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Trading Bots</span>
+                <Bot className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Trading Bots</span>
               </TabsTrigger>
 
               <TabsTrigger 
                 value="whales" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <Waves className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Whale Tracker</span>
+                <Waves className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Whale Tracker</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="strategies" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <BarChart2 className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Strategies</span>
+                <BarChart2 className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Strategies</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="chat" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <MessageCircle className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">AI Chat</span>
+                <MessageCircle className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">AI Chat</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="settings" 
-                className="flex items-center px-2 md:px-4 py-2 rounded-lg data-[state=active]:bg-gradient-orange-coral data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+                className="navbar-tab"
               >
-                <Settings className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="text-xs md:text-sm">Settings</span>
+                <Settings className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Settings</span>
               </TabsTrigger>
-
-
             </TabsList>
           </div>
           

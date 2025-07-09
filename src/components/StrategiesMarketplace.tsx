@@ -671,7 +671,7 @@ const StrategiesMarketplace: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold cosmic-text">Strategy Marketplace</h2>
+          <h2 className="text-3xl font-bold cosmic-text">🕸 Strategy Marketplace</h2>
           <p className="text-muted-foreground">Discover and deploy proven trading strategies</p>
         </div>
         <div className="flex items-center gap-3">

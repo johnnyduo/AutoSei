@@ -266,7 +266,7 @@ const TradingBotsDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-panel p-6">
+        <Card className="strategy-card performance-metric p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total P&L</p>
@@ -283,7 +283,7 @@ const TradingBotsDashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="strategy-card performance-metric p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Active Bots</p>
@@ -295,7 +295,7 @@ const TradingBotsDashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="strategy-card performance-metric p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Allocation</p>
@@ -307,7 +307,7 @@ const TradingBotsDashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="glass-panel p-6">
+        <Card className="strategy-card performance-metric p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Avg Win Rate</p>
@@ -323,7 +323,7 @@ const TradingBotsDashboard: React.FC = () => {
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Trading Bots</h2>
+          <h2 className="text-3xl font-bold cosmic-text">🤖 Trading Bots</h2>
           <p className="text-muted-foreground">Automated trading strategies and portfolio management</p>
         </div>
         <div className="flex gap-2">
@@ -331,7 +331,7 @@ const TradingBotsDashboard: React.FC = () => {
             variant="outline" 
             onClick={refreshData} 
             disabled={refreshing}
-            className="glass-panel border-primary/20 hover:border-primary/40"
+            className="strategy-card border-[#FF5723]/30 hover:border-[#FF5723]/50"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -379,7 +379,7 @@ const TradingBotsDashboard: React.FC = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="glass-panel p-1">
+        <TabsList className="strategy-card p-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="history">Execution History</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -389,7 +389,7 @@ const TradingBotsDashboard: React.FC = () => {
           {/* Bot Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {bots.map((bot) => (
-              <Card key={bot.id} className="glass-panel hover:border-primary/40 transition-all duration-300">
+              <Card key={bot.id} className="strategy-card hover:border-[#FF5723]/40 transition-all duration-300">
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div>
@@ -495,7 +495,7 @@ const TradingBotsDashboard: React.FC = () => {
                   </div>
 
                   {/* Controls */}
-                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#FF5723]/30">
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={bot.status === 'active'}
@@ -514,7 +514,7 @@ const TradingBotsDashboard: React.FC = () => {
                   <Button 
                     onClick={() => executeBot(bot.id)}
                     disabled={bot.status !== 'active' || isExecuting === bot.id}
-                    className="w-full bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30"
+                    className="w-full bg-[#FF5723]/20 hover:bg-[#FF5723]/30 text-[#FF5723] border border-[#FF5723]/30"
                     variant="outline"
                   >
                     {isExecuting === bot.id ? (
@@ -536,7 +536,7 @@ const TradingBotsDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5" />
@@ -555,7 +555,7 @@ const TradingBotsDashboard: React.FC = () => {
                   {executions.slice(-10).reverse().map((execution) => {
                     const bot = bots.find(b => b.id === execution.botId);
                     return (
-                      <div key={execution.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg">
+                      <div key={execution.id} className="flex items-center justify-between p-3 border border-[#FF5723]/30 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full ${execution.success ? 'bg-green-400' : 'bg-red-400'}`} />
                           <div>
@@ -582,7 +582,7 @@ const TradingBotsDashboard: React.FC = () => {
 
         <TabsContent value="analytics" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="glass-panel">
+            <Card className="strategy-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
@@ -622,7 +622,7 @@ const TradingBotsDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="glass-panel">
+            <Card className="strategy-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <LineChart className="h-5 w-5" />

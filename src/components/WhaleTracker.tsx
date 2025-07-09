@@ -23,7 +23,8 @@ import {
   Filter,
   RefreshCw,
   ExternalLink,
-  Settings
+  Settings,
+  Search
 } from 'lucide-react';
 import { whaleTrackerService, WhaleTransaction, WhaleInsight, WhaleAlerts, TokenWhaleAnalysis } from '../services/whaleTrackerService';
 
@@ -191,7 +192,7 @@ const WhaleTracker: React.FC = () => {
 
       {/* Threshold Configuration Panel */}
       {showThresholdConfig && (
-        <Card className="glass-panel">
+        <Card className="strategy-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Settings className="h-5 w-5" />
@@ -311,7 +312,7 @@ const WhaleTracker: React.FC = () => {
 
       {/* Show loading state if no data has been loaded yet */}
       {!hasLoadedData && loading && (
-        <Card className="glass-panel">
+        <Card className="strategy-card">
           <CardContent className="p-12">
             <div className="text-center">
               <RefreshCw className="h-12 w-12 mx-auto mb-4 animate-spin text-primary" />
@@ -324,7 +325,7 @@ const WhaleTracker: React.FC = () => {
 
       {/* Show empty state if no data and not loading */}
       {!hasLoadedData && !loading && (
-        <Card className="glass-panel">
+        <Card className="strategy-card">
           <CardContent className="p-12">
             <div className="text-center">
               <Waves className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -344,8 +345,8 @@ const WhaleTracker: React.FC = () => {
 
       {/* Navigation Tabs - Only show when data is loaded */}
       {hasLoadedData && (
-        <Card className="glass-panel">
-          <div className="flex flex-wrap gap-2 p-4 border-b">
+        <Card className="glass-panel p-6">
+          <div className="flex flex-wrap gap-2 border-b border-[#FF5723]/30 pb-4">
             {[
             { id: 'overview', label: 'Overview', icon: Eye },
             { id: 'transactions', label: 'Transactions', icon: Activity },
@@ -369,13 +370,48 @@ const WhaleTracker: React.FC = () => {
         </Card>
       )}
 
+      {/* Filters - Only show when data is loaded */}
+      {hasLoadedData && (
+        <Card className="glass-panel p-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  placeholder="Search whale addresses, transactions, or insights..."
+                  className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
+                />
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value as any)}
+                className="px-3 py-2 border border-border rounded-lg bg-background text-sm min-w-40"
+              >
+                <option value="all">All Impact Levels</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+              </select>
+              
+              <button className="flex items-center space-x-2 px-3 py-2 border border-border rounded-lg bg-background text-sm hover:bg-muted transition-colors">
+                <Filter className="h-4 w-4" />
+                <span>Filters</span>
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Content - Only show when data is loaded */}
       {hasLoadedData && (
         <>
           {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Large Transfers */}
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Zap className="h-5 w-5 text-yellow-500" />
@@ -419,7 +455,7 @@ const WhaleTracker: React.FC = () => {
           </Card>
 
           {/* Risk Alerts */}
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="h-5 w-5 text-red-500" />
@@ -461,25 +497,10 @@ const WhaleTracker: React.FC = () => {
       )}
 
       {activeTab === 'transactions' && (
-        <Card className="glass-panel">
+        <Card className="strategy-card">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Whale Transactions</CardTitle>
-              
-              <div className="flex items-center space-x-3">
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value as any)}
-                  className="px-3 py-2 border rounded-lg bg-background text-sm"
-                >
-                  <option value="all">All Impact Levels</option>
-                  <option value="critical">Critical</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                </select>
-                
-                <Filter className="h-4 w-4 text-muted-foreground" />
-              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -558,7 +579,7 @@ const WhaleTracker: React.FC = () => {
       {activeTab === 'insights' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {insights.map((insight, index) => (
-            <Card key={index} className="glass-panel">
+            <Card key={index} className="strategy-card">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
@@ -632,7 +653,7 @@ const WhaleTracker: React.FC = () => {
       {activeTab === 'analysis' && tokenAnalysis && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Token Overview */}
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Target className="h-5 w-5" />
@@ -674,7 +695,7 @@ const WhaleTracker: React.FC = () => {
           </Card>
 
           {/* Risk Assessment */}
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="h-5 w-5" />
@@ -730,7 +751,7 @@ const WhaleTracker: React.FC = () => {
           </Card>
 
           {/* Recent Activity */}
-          <Card className="glass-panel">
+          <Card className="strategy-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Activity className="h-5 w-5" />
