@@ -44,7 +44,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
 
   const handleSocialClick = (platform: string) => {
     const urls = {
-      github: 'https://github.com/autosei',
+      github: 'https://github.com/johnnyduo/AutoSei',
       twitter: 'https://twitter.com/autosei',
       discord: 'https://discord.gg/autosei'
     };
@@ -135,7 +135,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 <Button 
                   onClick={handleLaunchApp} 
                   disabled={isLoading}
-                  className="neuro-button hover:scale-105 transition-all"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
