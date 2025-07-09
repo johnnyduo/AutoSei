@@ -521,4 +521,93 @@
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Strategy Marketplace Enhancements */
+  .strategy-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(8px);
+    background: hsl(var(--card) / 0.95);
+  }
+
+  .strategy-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px hsl(var(--foreground) / 0.1);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  .strategy-card .group:hover .group-hover\:text-primary {
+    color: hsl(var(--primary));
+  }
+
+  /* Performance metric cards */
+  .performance-metric {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .performance-metric:hover {
+    transform: scale(1.02);
+  }
+
+  /* Deployment progress animation */
+  .deployment-progress {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0.2) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--primary) / 0.2) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Strategy tag animations */
+  .strategy-tag {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .strategy-tag:hover {
+    transform: scale(1.05);
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary));
+  }
+
+  /* Enhance deployment modal */
+  .deployment-modal {
+    backdrop-filter: blur(12px);
+    background: hsl(var(--background) / 0.98);
+  }
+
+  /* Risk indicator pulses */
+  .risk-indicator-high {
+    animation: pulse-red 2s ease-in-out infinite;
+  }
+
+  .risk-indicator-medium {
+    animation: pulse-yellow 2s ease-in-out infinite;
+  }
+
+  .risk-indicator-low {
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes pulse-yellow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.9; }
+  }
 }

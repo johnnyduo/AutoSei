@@ -1083,3 +1083,147 @@ export const formatUSDCAmount = (amount: bigint, decimals: number = 6): string =
   
   return `${wholePart}.${trimmedFractional}`;
 };
+
+// Convert dollar amount to USDC wei (6 decimals)
+export const dollarToUSDCWei = (dollarAmount: number): bigint => {
+  return BigInt(Math.floor(dollarAmount * 10**6));
+};
+
+// USDC Transfer function for strategy payments
+export function useUSDCTransfer() {
+  const { address } = useAccount();
+  
+  const transferUSDC = async (to: `0x${string}`, amount: bigint) => {
+    if (!address) {
+      throw new Error('Wallet not connected');
+    }
+    
+    // Get the provider and signer
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    
+    // Create contract instance
+    const contract = new Contract(
+      MOCK_USDC_ADDRESS,
+      MockUSDCABI,
+      signer
+    );
+    
+    console.log('Transferring USDC:', {
+      from: address,
+      to,
+      amount: amount.toString(),
+      amountFormatted: formatUSDCAmount(amount)
+    });
+    
+    // Call the transfer function
+    const tx = await contract.transfer(to, amount);
+    console.log('USDC transfer transaction:', tx.hash);
+    
+    // Wait for confirmation
+    const receipt = await tx.wait();
+    console.log('USDC transfer confirmed:', receipt);
+    
+    return {
+      hash: tx.hash,
+      receipt
+    };
+  };
+
+  return {
+    transferUSDC,
+    isPending: false
+  };
+}
+
+// USDC Approval function for spending
+export function useUSDCApproval() {
+  const { address } = useAccount();
+  
+  const approveUSDC = async (spender: `0x${string}`, amount: bigint) => {
+    if (!address) {
+      throw new Error('Wallet not connected');
+    }
+    
+    // Get the provider and signer
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    
+    // Create contract instance
+    const contract = new Contract(
+      MOCK_USDC_ADDRESS,
+      MockUSDCABI,
+      signer
+    );
+    
+    console.log('Approving USDC:', {
+      owner: address,
+      spender,
+      amount: amount.toString(),
+      amountFormatted: formatUSDCAmount(amount)
+    });
+    
+    // Call the approve function
+    const tx = await contract.approve(spender, amount);
+    console.log('USDC approval transaction:', tx.hash);
+    
+    // Wait for confirmation
+    const receipt = await tx.wait();
+    console.log('USDC approval confirmed:', receipt);
+    
+    return {
+      hash: tx.hash,
+      receipt
+    };
+  };
+
+  return {
+    approveUSDC,
+    isPending: false
+  };
+}
+
+// Strategy payment destination (treasury/DAO address)
+export const STRATEGY_PAYMENT_ADDRESS = '0x1234567890123456789012345678901234567890' as `0x${string}`;
+
+// Function to handle strategy purchase payment
+export async function payForStrategy(strategyPrice: number): Promise<{ hash: string; receipt: any }> {
+  const provider = new BrowserProvider((window as any).ethereum);
+  const signer = await provider.getSigner();
+  const address = await signer.getAddress();
+  
+  if (!address) {
+    throw new Error('Wallet not connected');
+  }
+  
+  // Convert price to USDC wei
+  const amountWei = dollarToUSDCWei(strategyPrice);
+  
+  // Create contract instance
+  const contract = new Contract(
+    MOCK_USDC_ADDRESS,
+    MockUSDCABI,
+    signer
+  );
+  
+  console.log('Paying for strategy:', {
+    from: address,
+    to: STRATEGY_PAYMENT_ADDRESS,
+    price: strategyPrice,
+    amount: amountWei.toString(),
+    amountFormatted: formatUSDCAmount(amountWei)
+  });
+  
+  // Transfer USDC to treasury
+  const tx = await contract.transfer(STRATEGY_PAYMENT_ADDRESS, amountWei);
+  console.log('Strategy payment transaction:', tx.hash);
+  
+  // Wait for confirmation
+  const receipt = await tx.wait();
+  console.log('Strategy payment confirmed:', receipt);
+  
+  return {
+    hash: tx.hash,
+    receipt
+  };
+}
