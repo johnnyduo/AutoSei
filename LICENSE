@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2025 AutoSei
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+ADDITIONAL DISCLAIMERS FOR DEFI SOFTWARE:
+
+This software is designed for educational and informational purposes. The use of 
+this software for financial decisions is at the user's own risk. The authors and 
+contributors are not responsible for any financial losses, security breaches, or 
+other damages that may occur from the use of this software.
+
+DeFi investments carry significant risks including but not limited to:
+- Smart contract vulnerabilities
+- Market volatility
+- Regulatory changes
+- Technical failures
+- Loss of funds
+
+Users should:
+- Conduct their own research
+- Understand the risks involved
+- Never invest more than they can afford to lose
+- Comply with local regulations
+- Use the software in testnet environments before mainnet
+
+The AI-powered features provide suggestions and analysis but do not constitute 
+financial advice. Always consult with qualified financial advisors before making 
+investment decisions.
