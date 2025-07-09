@@ -1,4 +1,3 @@
-// src/components/PortfolioOverview.tsx
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -123,19 +122,21 @@ const PortfolioOverview = () => {
   const performanceScore = portfolioSummary?.performanceScore ? Number(portfolioSummary.performanceScore) : 0;
   
   // Convert contract allocations to token holdings with enhanced data
-  const tokenHoldings: TokenHolding[] = allocations.map((allocation) => ({
-    id: allocation.id,
-    symbol: allocation.name.split(' ')[0], // Extract symbol from name
-    name: allocation.name,
-    allocation: allocation.allocation,
-    category: allocation.id,
-    value: (allocation.allocation / 100) * Math.max(totalPortfolioValue, 10000), // Use total portfolio or minimum $10k for demo
-    color: allocation.color,
-    description: getCategoryDescription(allocation.id)
-  }));
+  const tokenHoldings: TokenHolding[] = allocations
+    .filter(allocation => allocation.allocation > 0) // Only include categories with allocation > 0
+    .map((allocation) => ({
+      id: allocation.id,
+      symbol: allocation.name.split(' ')[0], // Extract symbol from name
+      name: allocation.name,
+      allocation: allocation.allocation,
+      category: allocation.id,
+      value: (allocation.allocation / 100) * Math.max(totalPortfolioValue, 10000), // Use total portfolio or minimum $10k for demo
+      color: allocation.color,
+      description: getCategoryDescription(allocation.id)
+    }));
   
-  const hasHoldings = allocations.length > 0; // Changed from tokenHoldings to allocations
-  const activeCategories = allocations.length; // Changed from tokenHoldings to allocations
+  const hasHoldings = tokenHoldings.length > 0; // Use tokenHoldings since we filter out zero allocations
+  const activeCategories = tokenHoldings.length; // Use tokenHoldings count
   const totalCategories = supportedCategories?.length || 7;
 
   // Enhanced category descriptions
@@ -523,11 +524,23 @@ const PortfolioOverview = () => {
                     <svg width="400" height="400" viewBox="0 0 400 400" className="transform -rotate-90">
                       {/* Pie Chart Segments */}
                       {(() => {
+                        // Normalize allocations to ensure they sum to 100%
+                        const totalAllocation = tokenHoldings.reduce((sum, token) => sum + token.allocation, 0);
+                        const normalizedHoldings = totalAllocation > 0 ? 
+                          tokenHoldings.map(token => ({
+                            ...token,
+                            normalizedAllocation: (token.allocation / totalAllocation) * 100
+                          })) : 
+                          tokenHoldings.map(token => ({ ...token, normalizedAllocation: 0 }));
+                        
                         let cumulativePercentage = 0;
-                        return tokenHoldings.map((token, index) => {
+                        return normalizedHoldings.map((token, index) => {
                           const startAngle = cumulativePercentage * 3.6; // Convert percentage to degrees
-                          const endAngle = (cumulativePercentage + token.allocation) * 3.6;
-                          cumulativePercentage += token.allocation;
+                          const endAngle = (cumulativePercentage + token.normalizedAllocation) * 3.6;
+                          cumulativePercentage += token.normalizedAllocation;
+                          
+                          // Skip rendering if allocation is 0 or very small
+                          if (token.normalizedAllocation < 0.1) return null;
                           
                           // Calculate path for pie slice
                           const centerX = 200;
@@ -548,7 +561,7 @@ const PortfolioOverview = () => {
                           const x4 = centerX + innerRadius * Math.cos(endAngleRad);
                           const y4 = centerY + innerRadius * Math.sin(endAngleRad);
                           
-                          const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+                          const largeArcFlag = token.normalizedAllocation > 50 ? 1 : 0;
                           
                           const pathData = [
                             `M ${x1} ${y1}`,
@@ -577,7 +590,7 @@ const PortfolioOverview = () => {
                               onMouseLeave={() => setHoveredToken(null)}
                             />
                           );
-                        });
+                        }).filter(Boolean);
                       })()}
                     </svg>
                     

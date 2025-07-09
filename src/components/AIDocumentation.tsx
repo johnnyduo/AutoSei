@@ -9,11 +9,11 @@ const AIDocumentation = () => {
       <Card className="card-glass">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Bot className="h-6 w-6 text-nebula-400" />
-            <CardTitle className="text-2xl">AI System Documentation</CardTitle>
+            <Bot className="h-6 w-6 text-[#FF5723]" />
+            <CardTitle className="text-2xl cosmic-text">AutoSei AI System Documentation</CardTitle>
           </div>
           <CardDescription>
-            How AutoSei uses artificial intelligence to enhance your DeFi experience
+            Comprehensive guide to AutoSei's AI-powered DeFi portfolio navigation and market intelligence system
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -43,184 +43,248 @@ const AIDocumentation = () => {
             
             <TabsContent value="overview" className="space-y-4">
               <div className="prose prose-invert max-w-none">
-                <h2 className="text-xl font-bold">AI-Powered DeFi Assistant</h2>
+                <h2 className="text-xl font-bold cosmic-text">AI-Powered DeFi Portfolio Navigator</h2>
                 <p>
-                  AutoSei uses advanced artificial intelligence to transform how users interact with 
-                  decentralized finance on the Sei network. Our AI system combines multiple technologies 
-                  to provide intelligent portfolio management, market analysis, and on-chain insights.
+                  AutoSei revolutionizes DeFi portfolio management on the Sei EVM network through advanced artificial intelligence. 
+                  Our AI system combines Google's Gemini 2.5 Pro with specialized financial algorithms to provide intelligent 
+                  portfolio optimization, real-time whale tracking, and conversational market insights.
                 </p>
                 
-                <h3 className="text-lg font-semibold mt-4">Key AI Capabilities</h3>
+                <h3 className="text-lg font-semibold mt-4 text-[#FF5723]">Core AI Features</h3>
                 <ul>
                   <li>
-                    <strong>Portfolio Optimization</strong>: AI-driven allocation suggestions based on market conditions, 
-                    risk tolerance, and historical performance
+                    <strong>Conversational Portfolio Analysis</strong>: Natural language interface powered by Gemini 2.5 Pro 
+                    for discussing portfolio strategies, risk assessment, and market conditions in plain English
                   </li>
                   <li>
-                    <strong>Natural Language Interface</strong>: Conversational AI that understands complex financial 
-                    queries and provides actionable insights
+                    <strong>Smart Contract Portfolio Management</strong>: AI-driven allocation recommendations across 7 asset 
+                    categories (AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin) with automated rebalancing
                   </li>
                   <li>
-                    <strong>On-Chain Analysis</strong>: Intelligent monitoring of whale transactions and market movements 
-                    with predictive insights
+                    <strong>Real-time Whale Activity Tracking</strong>: Intelligent monitoring of large transactions on Sei EVM 
+                    with predictive market impact analysis and automated alerts
                   </li>
                   <li>
-                    <strong>Market Intelligence</strong>: AI-powered analysis of market trends, token fundamentals, 
-                    and trading opportunities
+                    <strong>SeiTrace Integration</strong>: Deep blockchain analysis using Sei's native explorer API for 
+                    comprehensive on-chain intelligence and transaction pattern recognition
+                  </li>
+                  <li>
+                    <strong>50+ Token Intelligence</strong>: AI-powered insights for all supported tokens on Sei EVM, 
+                    including market analysis, technical indicators, and fundamental research
                   </li>
                 </ul>
                 
-                <h3 className="text-lg font-semibold mt-4">AI System Architecture</h3>
+                <h3 className="text-lg font-semibold mt-4 text-[#FF5723]">Hybrid AI Architecture</h3>
                 <p>
-                  Our AI system uses a hybrid approach that combines:
+                  AutoSei's AI system employs a sophisticated hybrid approach optimized for DeFi applications:
                 </p>
                 <ul>
-                  <li>Large Language Models (LLMs) for natural language understanding and generation</li>
-                  <li>Rule-based systems for financial safety and compliance</li>
-                  <li>Pattern recognition for market trend identification</li>
-                  <li>On-chain data analysis for blockchain intelligence</li>
+                  <li><strong>Google Gemini 2.5 Pro</strong>: Advanced language model for natural conversations and complex analysis</li>
+                  <li><strong>Financial Rule Engine</strong>: Specialized algorithms for portfolio validation and risk management</li>
+                  <li><strong>Pattern Recognition AI</strong>: Machine learning for whale behavior and market trend identification</li>
+                  <li><strong>Sei EVM Analytics</strong>: Custom intelligence layer for blockchain-specific insights</li>
+                  <li><strong>Real-time Data Fusion</strong>: Intelligent aggregation of SeiTrace, CoinGecko, and market data</li>
                 </ul>
                 
-                <p>
-                  This multi-layered approach ensures that AutoSei provides accurate, helpful, and 
-                  responsible AI assistance for your DeFi activities.
-                </p>
+                <div className="bg-gradient-to-r from-[#FF5723]/10 to-purple-500/10 rounded-lg p-4 border border-[#FF5723]/20 mt-4">
+                  <h4 className="font-semibold text-[#FF5723] mb-2">🚀 Sei EVM Native Features</h4>
+                  <p className="text-sm">
+                    AutoSei is built specifically for the Sei ecosystem, leveraging Sei's unique parallel execution, 
+                    twin-turbo consensus, and native orderbook to provide unparalleled DeFi intelligence and portfolio management.
+                  </p>
+                </div>
               </div>
             </TabsContent>
             
             <TabsContent value="models" className="space-y-4">
               <div className="prose prose-invert max-w-none">
-                <h2 className="text-xl font-bold">AI Models</h2>
+                <h2 className="text-xl font-bold cosmic-text">AI Models & Technologies</h2>
                 <p>
-                  AutoSei leverages state-of-the-art AI models to power its intelligent features. 
-                  Our primary AI engine is built on Google's Gemini 2.5 Pro, with specialized components 
-                  for financial analysis and blockchain data processing.
+                  AutoSei leverages cutting-edge AI technologies specifically optimized for DeFi portfolio management 
+                  and blockchain analysis. Our primary AI engine is Google's Gemini 2.5 Pro, enhanced with specialized 
+                  components for financial analysis and Sei EVM integration.
                 </p>
                 
-                <div className="bg-cosmic-800 p-4 rounded-lg mt-4">
-                  <h3 className="text-lg font-semibold text-nebula-400">Gemini 2.5 Pro</h3>
+                <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20 mt-4">
+                  <h3 className="text-lg font-semibold text-purple-400 flex items-center gap-2">
+                    <Brain className="h-5 w-5" />
+                    Google Gemini 2.5 Pro - Primary AI Engine
+                  </h3>
                   <p className="mt-2">
-                    Gemini 2.5 Pro is Google's multimodal AI model that powers our natural language 
-                    understanding and generation capabilities. This model enables AutoSei to:
+                    Gemini 2.5 Pro serves as AutoSei's conversational AI brain, enabling sophisticated natural language 
+                    understanding for complex DeFi portfolio discussions and market analysis.
                   </p>
-                  <ul className="mt-2">
-                    <li>Understand complex financial queries</li>
-                    <li>Generate detailed market analyses</li>
-                    <li>Explain DeFi concepts in accessible language</li>
-                    <li>Provide personalized portfolio recommendations</li>
+                  <ul className="mt-2 space-y-1">
+                    <li><strong>Portfolio Conversations</strong>: Discuss allocation strategies in natural language</li>
+                    <li><strong>Market Analysis</strong>: Generate detailed insights on Sei EVM tokens and protocols</li>
+                    <li><strong>Risk Assessment</strong>: Explain portfolio risks and diversification strategies</li>
+                    <li><strong>Educational Content</strong>: Simplify complex DeFi concepts for all user levels</li>
+                    <li><strong>Whale Activity Analysis</strong>: Interpret large transaction impacts and implications</li>
                   </ul>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    The model has been fine-tuned for financial and blockchain-specific language 
-                    through specialized prompt engineering.
-                  </p>
+                  <div className="mt-3 p-2 bg-purple-500/10 rounded text-xs">
+                    <strong>AutoSei Enhancement:</strong> Custom prompt engineering for Sei ecosystem, DeFi protocols, 
+                    and portfolio management best practices.
+                  </div>
                 </div>
                 
-                <div className="bg-cosmic-800 p-4 rounded-lg mt-4">
-                  <h3 className="text-lg font-semibold text-nebula-400">Rule-Based Systems</h3>
+                <div className="bg-gradient-to-r from-[#FF5723]/10 to-orange-500/10 rounded-lg p-4 border border-[#FF5723]/20 mt-4">
+                  <h3 className="text-lg font-semibold text-[#FF5723] flex items-center gap-2">
+                    <BarChart2 className="h-5 w-5" />
+                    Financial Analytics Engine
+                  </h3>
                   <p className="mt-2">
-                    In addition to Gemini, we employ rule-based systems for:
+                    Specialized algorithms designed for DeFi portfolio management and risk analysis:
                   </p>
-                  <ul className="mt-2">
-                    <li>Portfolio allocation validation</li>
-                    <li>Risk assessment calculations</li>
-                    <li>Transaction pattern classification</li>
-                    <li>Fallback responses when API services are unavailable</li>
+                  <ul className="mt-2 space-y-1">
+                    <li><strong>7-Category Allocation Model</strong>: AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin optimization</li>
+                    <li><strong>Risk-Adjusted Scoring</strong>: Dynamic portfolio performance evaluation</li>
+                    <li><strong>Rebalancing Algorithms</strong>: Smart contract-based automated portfolio adjustments</li>
+                    <li><strong>Correlation Analysis</strong>: Inter-category and token correlation modeling</li>
+                    <li><strong>Volatility Prediction</strong>: Market stability forecasting for Sei EVM assets</li>
                   </ul>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    These rule-based components ensure reliability and provide guardrails for the AI system.
-                  </p>
                 </div>
                 
-                <h3 className="text-lg font-semibold mt-4">Model Selection Process</h3>
+                <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg p-4 border border-blue-500/20 mt-4">
+                  <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
+                    <Database className="h-5 w-5" />
+                    Sei EVM Intelligence Layer
+                  </h3>
+                  <p className="mt-2">
+                    Custom AI models trained specifically for Sei blockchain analysis:
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    <li><strong>SeiTrace Integration</strong>: Real-time blockchain data processing and analysis</li>
+                    <li><strong>Whale Detection</strong>: Pattern recognition for large transaction identification</li>
+                    <li><strong>Contract Intelligence</strong>: Smart contract interaction analysis and optimization</li>
+                    <li><strong>Network Activity Monitoring</strong>: Sei EVM usage patterns and congestion prediction</li>
+                    <li><strong>Token Performance Tracking</strong>: Historical and predictive analysis for 50+ tokens</li>
+                  </ul>
+                </div>
+                
+                <h3 className="text-lg font-semibold mt-4 text-[#FF5723]">Intelligent Model Selection</h3>
                 <p>
-                  Our AI system dynamically selects the appropriate model or combination of models based on:
+                  AutoSei's AI orchestrator dynamically selects optimal models based on:
                 </p>
                 <ul>
-                  <li>The type of user query or task</li>
-                  <li>Available data sources</li>
-                  <li>Required response speed</li>
-                  <li>Confidence thresholds</li>
+                  <li><strong>Query Type</strong>: Conversational vs analytical vs predictive requests</li>
+                  <li><strong>Data Complexity</strong>: Simple portfolio questions vs complex market analysis</li>
+                  <li><strong>Response Time Requirements</strong>: Real-time whale alerts vs detailed research</li>
+                  <li><strong>Confidence Thresholds</strong>: Fallback to rule-based systems when AI confidence is low</li>
+                  <li><strong>User Context</strong>: Portfolio composition and risk tolerance considerations</li>
                 </ul>
-                <p>
-                  This ensures optimal performance while maintaining response quality across different scenarios.
-                </p>
               </div>
             </TabsContent>
             
             <TabsContent value="data" className="space-y-4">
               <div className="prose prose-invert max-w-none">
-                <h2 className="text-xl font-bold">Data Sources</h2>
+                <h2 className="text-xl font-bold cosmic-text">Data Sources & Integration</h2>
                 <p>
-                  AutoSei's AI system integrates multiple data sources to provide comprehensive insights 
-                  for DeFi decision-making. Our data pipeline combines on-chain data, market information, 
-                  and historical patterns.
+                  AutoSei's AI system integrates multiple high-quality data sources to provide comprehensive insights 
+                  for DeFi decision-making. Our data pipeline combines real-time Sei blockchain data, market intelligence, 
+                  and historical patterns specifically optimized for the Sei EVM ecosystem.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div className="bg-cosmic-800 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-nebula-400 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-[#FF5723]/10 to-orange-500/10 rounded-lg p-4 border border-[#FF5723]/20">
+                    <h3 className="text-lg font-semibold text-[#FF5723] flex items-center gap-2">
                       <BarChart2 className="h-5 w-5" />
-                      On-Chain Data
+                      Sei EVM Blockchain Data
                     </h3>
-                    <ul className="mt-2">
-                      <li>Sei Explorer API for transaction data</li>
-                      <li>Smart contract events and interactions</li>
-                      <li>Token transfers and whale movements</li>
-                      <li>Wallet behavior and patterns</li>
-                      <li>Protocol metrics (TVL, volume, etc.)</li>
+                    <ul className="mt-2 space-y-1">
+                      <li><strong>SeiTrace Explorer API</strong>: Real-time transaction monitoring and analysis</li>
+                      <li><strong>Smart Contract Events</strong>: AutoSei portfolio contract interactions</li>
+                      <li><strong>Whale Detection</strong>: Large transaction identification ($10,000+ threshold)</li>
+                      <li><strong>Token Transfers</strong>: 50+ supported ERC-20 tokens on Sei EVM</li>
+                      <li><strong>Wallet Patterns</strong>: Address behavior and interaction analysis</li>
+                      <li><strong>Network Health</strong>: Gas fees, block times, and congestion metrics</li>
                     </ul>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Data is fetched in real-time from the Sei blockchain for the most current insights.
-                    </p>
+                    <div className="mt-2 p-2 bg-[#FF5723]/10 rounded text-xs">
+                      <strong>Real-time Processing:</strong> Sub-second latency for blockchain events and whale alerts
+                    </div>
                   </div>
                   
-                  <div className="bg-cosmic-800 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-nebula-400 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg p-4 border border-blue-500/20">
+                    <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
                       <Database className="h-5 w-5" />
-                      Market Data
+                      Market Intelligence
                     </h3>
-                    <ul className="mt-2">
-                      <li>Token prices and market caps</li>
-                      <li>Trading volumes and liquidity metrics</li>
-                      <li>Historical price patterns</li>
-                      <li>Yield and APR information</li>
-                      <li>Market sentiment indicators</li>
+                    <ul className="mt-2 space-y-1">
+                      <li><strong>CoinGecko API</strong>: Token prices, market caps, and 24h volumes</li>
+                      <li><strong>Historical Data</strong>: Price patterns and correlation analysis</li>
+                      <li><strong>Yield Tracking</strong>: DeFi protocol APY and TVL metrics</li>
+                      <li><strong>Market Sentiment</strong>: Social signals and trading volume trends</li>
+                      <li><strong>Category Performance</strong>: AI, Meme, RWA, BigCap, DeFi, L1 sector analysis</li>
+                      <li><strong>Risk Metrics</strong>: Volatility, correlation, and drawdown statistics</li>
                     </ul>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Market data is sourced from CoinGecko API and other providers with regular updates.
-                    </p>
+                    <div className="mt-2 p-2 bg-blue-500/10 rounded text-xs">
+                      <strong>Update Frequency:</strong> Real-time prices with 5-minute market data refresh
+                    </div>
                   </div>
                 </div>
                 
-                <h3 className="text-lg font-semibold mt-4">Data Processing</h3>
-                <p>
-                  Raw data undergoes several processing steps before being used by our AI models:
-                </p>
-                <ol>
-                  <li>
-                    <strong>Cleaning and Normalization</strong>: Standardizing data formats and handling missing values
-                  </li>
-                  <li>
-                    <strong>Feature Extraction</strong>: Identifying relevant patterns and metrics from raw data
-                  </li>
-                  <li>
-                    <strong>Contextual Enrichment</strong>: Adding historical context and related information
-                  </li>
-                  <li>
-                    <strong>Real-time Integration</strong>: Combining fresh data with existing knowledge
-                  </li>
-                </ol>
+                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/20 mt-4">
+                  <h3 className="text-lg font-semibold text-purple-400">🎯 Token Universe (50+ Supported)</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 text-sm">
+                    <div><strong>AI Category:</strong> DEEP, PUNK</div>
+                    <div><strong>Meme/NFT:</strong> WEN, BEAST, FISH</div>
+                    <div><strong>RWA:</strong> ASMB, LUM, MLUM</div>
+                    <div><strong>BigCap:</strong> BTC, ETH, SEI</div>
+                    <div><strong>DeFi:</strong> AVAX, FTM, MATIC</div>
+                    <div><strong>L1:</strong> SMR, FUSE, IPG</div>
+                    <div><strong>Stable:</strong> USDC, USDT</div>
+                    <div><strong>Others:</strong> AAP, AUR, HODLHamster, NHU, LOVE, wBNB</div>
+                  </div>
+                </div>
                 
-                <h3 className="text-lg font-semibold mt-4">Data Privacy</h3>
-                <p>
-                  AutoSei respects user privacy and data security:
-                </p>
-                <ul>
-                  <li>All blockchain data used is already publicly available</li>
-                  <li>User portfolio data is processed locally when possible</li>
-                  <li>No personally identifiable information is stored or processed</li>
-                  <li>API calls to external services are made with minimal necessary data</li>
-                </ul>
+                <h3 className="text-lg font-semibold mt-4 text-[#FF5723]">Advanced Data Processing Pipeline</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <h4 className="font-semibold text-purple-400">Real-time Processing</h4>
+                    <ol className="text-sm space-y-1 mt-1">
+                      <li><strong>1. Data Ingestion</strong>: Multi-source API aggregation with error handling</li>
+                      <li><strong>2. Validation</strong>: Data quality checks and anomaly detection</li>
+                      <li><strong>3. Normalization</strong>: Format standardization across all sources</li>
+                      <li><strong>4. Enrichment</strong>: Context addition and pattern recognition</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-purple-400">AI Enhancement</h4>
+                    <ol className="text-sm space-y-1 mt-1">
+                      <li><strong>1. Feature Extraction</strong>: Key metrics and trend identification</li>
+                      <li><strong>2. Context Building</strong>: Historical pattern correlation</li>
+                      <li><strong>3. Prompt Enrichment</strong>: Data integration for AI models</li>
+                      <li><strong>4. Response Validation</strong>: AI output quality assurance</li>
+                    </ol>
+                  </div>
+                </div>
+                
+                <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg mt-4">
+                  <h3 className="text-lg font-semibold text-green-400">🔒 Privacy & Security</h3>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    <li><strong>Public Data Only</strong>: All blockchain data is publicly available on Sei EVM</li>
+                    <li><strong>Local Processing</strong>: Portfolio calculations performed client-side when possible</li>
+                    <li><strong>Minimal PII</strong>: No personally identifiable information collected or stored</li>
+                    <li><strong>Secure APIs</strong>: Encrypted connections with rate limiting and authentication</li>
+                    <li><strong>Data Retention</strong>: Chat history stored locally with user control</li>
+                    <li><strong>Compliance</strong>: GDPR-compliant data handling and user rights</li>
+                  </ul>
+                </div>
+                
+                <h3 className="text-lg font-semibold mt-4 text-[#FF5723]">Data Quality & Reliability</h3>
+                <div className="space-y-2 text-sm">
+                  <p>
+                    <strong>Redundancy:</strong> Multiple data sources ensure continuity if any single API fails
+                  </p>
+                  <p>
+                    <strong>Caching Strategy:</strong> Intelligent caching reduces API calls while maintaining freshness
+                  </p>
+                  <p>
+                    <strong>Error Handling:</strong> Graceful fallbacks and user notifications for data issues
+                  </p>
+                  <p>
+                    <strong>Monitoring:</strong> Real-time data quality monitoring with automated alerts
+                  </p>
+                </div>
               </div>
             </TabsContent>
             
