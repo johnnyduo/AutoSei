@@ -101,14 +101,14 @@ const PortfolioOverview = () => {
   const usdcBalanceNumber = parseFloat(usdcBalanceFormatted);
   
   // Contract portfolio value with enhanced calculation - Fixed double counting
-  const contractValue = portfolioSummary?.totalValue || 0; // Don't use USDC balance here to avoid double counting
+  const contractValue = portfolioSummary?.totalValue ? Number(portfolioSummary.totalValue) : 0; // Convert BigInt to number
   const totalPortfolioValue = seiValue + contractValue + usdcBalanceNumber;
   
-  // Real performance from contract
-  const performanceScore = portfolioSummary?.performanceScore || 0;
-  const riskLevel = portfolioSummary?.riskLevel || 0;
+  // Real performance from contract - Convert BigInt values to numbers
+  const performanceScore = portfolioSummary?.performanceScore ? Number(portfolioSummary.performanceScore) : 0;
+  const riskLevel = portfolioSummary?.riskLevel ? Number(portfolioSummary.riskLevel) : 0;
   const autoRebalanceEnabled = portfolioSummary?.autoRebalance || false;
-  const lastRebalance = portfolioSummary?.lastRebalance || 0;
+  const lastRebalance = portfolioSummary?.lastRebalance ? Number(portfolioSummary.lastRebalance) : 0;
   
   // Convert contract allocations to token holdings with enhanced data
   const tokenHoldings: TokenHolding[] = allocations.map((allocation) => ({
@@ -321,14 +321,16 @@ const PortfolioOverview = () => {
   };
 
   const getPerformanceIcon = (score: number) => {
-    if (score > 50) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (score < 30) return <TrendingDown className="h-4 w-4 text-red-500" />;
+    const numScore = Number(score) || 0; // Ensure it's a number with fallback
+    if (numScore > 50) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (numScore < 30) return <TrendingDown className="h-4 w-4 text-red-500" />;
     return <Activity className="h-4 w-4 text-yellow-500" />;
   };
 
   const getPerformanceColor = (score: number) => {
-    if (score > 50) return 'text-green-500';
-    if (score < 30) return 'text-red-500';
+    const numScore = Number(score) || 0; // Ensure it's a number with fallback
+    if (numScore > 50) return 'text-green-500';
+    if (numScore < 30) return 'text-red-500';
     return 'text-yellow-500';
   };
 
@@ -389,7 +391,7 @@ const PortfolioOverview = () => {
               <div className="flex items-center text-xs text-muted-foreground mt-1">
                 {getPerformanceIcon(performanceScore)}
                 <span className={`ml-1 ${getPerformanceColor(performanceScore)}`}>
-                  Performance Score: {performanceScore.toFixed(1)}%
+                  Performance Score: {(Number(performanceScore) || 0).toFixed(1)}%
                 </span>
               </div>
             </CardContent>

@@ -1,10 +1,9 @@
-
 // src/contexts/BlockchainContext.tsx
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
-import { toast } from 'sonner';
-import { updateAllocations, getExplorerUrl, AUTOSEI_PORTFOLIO_CORE_ADDRESS } from '../lib/contractService';
-import AutomatedPortfolioABI from '../abi/AutomatedPortfolio.json';
+import { useToast } from '@/components/ui/use-toast';
+import { updateAllocations, getExplorerUrl, AUTOSEI_PORTFOLIO_CORE_ADDRESS, registerUserManually, checkUserRegistrationStatus } from '../lib/contractService';
+import AutoSeiPortfolioCoreABI from '../abi/AutoSeiPortfolioCore.json';
 import { useContractRead, useWaitForTransactionReceipt } from 'wagmi';
 
 // Define the default allocations
@@ -56,6 +55,10 @@ interface BlockchainContextType {
   
   // Refresh function
   refreshAllocations: () => Promise<void>;
+  
+  // Registration functions
+  registerUser: (riskLevel?: number) => Promise<boolean>;
+  checkRegistrationStatus: () => Promise<{ isRegistered: boolean; userAddress: string; riskLevel?: number; totalValue?: string; }>;
 }
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
@@ -66,11 +69,12 @@ const TRANSACTIONS_STORAGE_KEY = 'autosei_transactions';
 
 export function BlockchainProvider({ children }: { children: ReactNode }) {
   const { isConnected, address } = useAccount();
+  const { toast } = useToast();
   
   // Check if the connected wallet is the contract owner
   const { data: ownerAddress, isLoading: isOwnerLoading } = useContractRead({
     address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
-    abi: AutomatedPortfolioABI,
+    abi: AutoSeiPortfolioCoreABI,
     functionName: 'owner',
   });
   
@@ -80,7 +84,7 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
   // Use the portfolio allocations hook from contractService
   const { data: contractAllocations, isLoading: isAllocationsLoading, refetch } = useContractRead({
     address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
-    abi: AutomatedPortfolioABI,
+    abi: AutoSeiPortfolioCoreABI,
     functionName: 'getAllocations',
   });
 
@@ -187,12 +191,15 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       
       // Show success message
       if (status === 'confirmed') {
-        toast.success("Transaction Confirmed", {
+        toast({
+          title: "Transaction Confirmed",
           description: "Your allocation changes have been confirmed on the blockchain."
         });
       } else {
-        toast.error("Transaction Failed", {
-          description: "Your allocation changes failed to process on the blockchain."
+        toast({
+          title: "Transaction Failed",
+          description: "Your allocation changes failed to process on the blockchain.",
+          variant: "destructive"
         });
       }
     }
@@ -234,17 +241,20 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
     });
     
     if (!isConnected) {
-      toast.error("Wallet Not Connected", {
-        description: "Please connect your wallet to update portfolio allocations."
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to update portfolio allocations.",
+        variant: "destructive"
       });
       return false;
     }
     
     if (!isContractOwner) {
-      toast.error(
-        "Not Contract Owner", 
-        { description: "Only the contract owner can update allocations." }
-      );
+      toast({
+        title: "Not Contract Owner",
+        description: "Only the contract owner can update allocations.",
+        variant: "destructive"
+      });
       return false;
     }
     
@@ -254,8 +264,10 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
     if (!allocationsToUse) {
       // Only show this toast if not called from modal (to avoid duplicate messages)
       if (!fromModal) {
-        toast.error("No Changes", {
-          description: "There are no pending allocation changes to apply."
+        toast({
+          title: "No Changes",
+          description: "There are no pending allocation changes to apply.",
+          variant: "destructive"
         });
       }
       return false;
@@ -267,8 +279,10 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
     // Validate total allocation is 100%
     const total = allocationsToSubmit.reduce((sum, item) => sum + item.allocation, 0);
     if (total !== 100) {
-      toast.error("Invalid Allocation", {
-        description: `Total allocation must be 100%. Current total: ${total}%`
+      toast({
+        title: "Invalid Allocation",
+        description: `Total allocation must be 100%. Current total: ${total}%`,
+        variant: "destructive"
       });
       return false;
     }
@@ -294,7 +308,8 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       console.log('No changes detected between current and pending allocations');
       // Only show this toast if not called from modal (to avoid duplicate messages)
       if (!fromModal) {
-        toast.info("No Changes Detected", {
+        toast({
+          title: "No Changes Detected",
           description: "Your allocations match the current portfolio. No update needed."
         });
       }
@@ -354,27 +369,25 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
         setPendingAllocations(null);
         
         // Show toast with link to explorer
-        toast.success(
-          fromModal ? "Portfolio Rebalance Submitted" : "Transaction Submitted", 
-          {
-            description: (
-              <div>
-                {fromModal 
-                  ? "Your allocation changes have been submitted to the blockchain." 
-                  : "Transaction has been submitted to the blockchain."
-                }{' '}
-                <a 
-                  href={getExplorerUrl(tx.hash)} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  View on Explorer
-                </a>
-              </div>
-            )
-          }
-        );
+        toast({
+          title: fromModal ? "Portfolio Rebalance Submitted" : "Transaction Submitted",
+          description: (
+            <div>
+              {fromModal 
+                ? "Your allocation changes have been submitted to the blockchain." 
+                : "Transaction has been submitted to the blockchain."
+              }{' '}
+              <a 
+                href={getExplorerUrl(tx.hash)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                View on Explorer
+              </a>
+            </div>
+          )
+        });
         
         return true;
       } catch (error: any) {
@@ -392,19 +405,34 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
           updateTransaction(txId, { status: 'failed', details: { ...pendingTx.details, error: 'Transaction cancelled by user' } });
           
           // Show a different toast for user cancellation
-          toast.info(
-            "Transaction Cancelled", 
-            { description: "You cancelled the transaction. No changes were made to your portfolio." }
-          );
+          toast({
+            title: "Transaction Cancelled",
+            description: "You cancelled the transaction. No changes were made to your portfolio."
+          });
         } else {
           // For other errors, show the error toast
           console.error('Error in contract interaction:', error);
           updateTransaction(txId, { status: 'failed', details: { ...pendingTx.details, error: error.message || 'Transaction failed' } });
           
-          toast.error(
-            "Transaction Failed", 
-            { description: error.message || "Failed to update allocations. Please try again." }
-          );
+          // Check if this is a registration-related error
+          const isRegistrationError = 
+            error.message?.includes('Not registered') || 
+            error.message?.includes('Failed to register user') ||
+            error.message?.includes('Registration appeared to succeed but user is still not active');
+          
+          if (isRegistrationError) {
+            toast({
+              title: "Registration Issue",
+              description: "There was an issue with user registration. Please try connecting your wallet again or contact support.",
+              variant: "destructive"
+            });
+          } else {
+            toast({
+              title: "Transaction Failed",
+              description: error.message || "Failed to update allocations. Please try again.",
+              variant: "destructive"
+            });
+          }
         }
         
         return false;
@@ -426,8 +454,10 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
         }
       });
       
-      toast.error("Update Failed", { 
-        description: error.message || "Failed to update allocations. Please try again."
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update allocations. Please try again.",
+        variant: "destructive"
       });
       
       return false;
@@ -436,6 +466,56 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
     }
   };
   
+  // Registration functions
+  const registerUser = async (riskLevel: number = 3): Promise<boolean> => {
+    try {
+      if (!address) {
+        toast({
+          title: "Wallet Not Connected",
+          description: "Please connect your wallet to register.",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      const tx = await registerUserManually(riskLevel);
+      
+      toast({
+        title: "Registration Successful",
+        description: `User registered with risk level ${riskLevel}. Transaction: ${tx.hash}`,
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error registering user:', error);
+      
+      if (error.message?.includes('already registered')) {
+        toast({
+          title: "Already Registered",
+          description: "Your wallet is already registered with the contract.",
+        });
+        return true; // Consider this a success since they are registered
+      }
+      
+      toast({
+        title: "Registration Failed",
+        description: error.message || "Failed to register user. Please try again.",
+        variant: "destructive"
+      });
+      
+      return false;
+    }
+  };
+
+  const checkRegistrationStatus = async () => {
+    try {
+      return await checkUserRegistrationStatus();
+    } catch (error: any) {
+      console.error('Error checking registration status:', error);
+      throw error;
+    }
+  };
+
   return (
     <BlockchainContext.Provider value={{
       allocations,
@@ -451,7 +531,9 @@ export function BlockchainProvider({ children }: { children: ReactNode }) {
       contractAddress: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
       isContractOwner,
       ownerAddress: ownerAddress as string || null,
-      refreshAllocations
+      refreshAllocations,
+      registerUser,
+      checkRegistrationStatus
     }}>
       {children}
     </BlockchainContext.Provider>

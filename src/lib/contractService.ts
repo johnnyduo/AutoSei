@@ -127,12 +127,75 @@ export const updateAllocations = async (allocations: Allocation[]) => {
     // Get contract config for basic allocation updates
     const contractConfig = getContractConfig('basic');
     
+    console.log('Contract config:', {
+      address: contractConfig.address,
+      name: contractConfig.name,
+      abiLength: contractConfig.abi.length
+    });
+    
+    // Validate contract address
+    if (!contractConfig.address || contractConfig.address === '0x0000000000000000000000000000000000000000') {
+      throw new Error(`Invalid contract address: ${contractConfig.address}. Please check your environment variables.`);
+    }
+    
     // Create contract instance - ethers v6 syntax
     const contract = new Contract(
       contractConfig.address,
       contractConfig.abi,
       signer
     );
+    
+    console.log('Contract instance created:', {
+      address: await contract.getAddress(),
+      hasUpdateUserAllocations: typeof contract.updateUserAllocations === 'function'
+    });
+    
+    // Check if the function exists
+    if (typeof contract.updateUserAllocations !== 'function') {
+      console.error('updateUserAllocations function not found on contract');
+      console.log('Available functions:', Object.keys(contract.interface.fragments.filter(f => f.type === 'function')));
+      throw new Error('updateUserAllocations function not found on contract');
+    }
+    
+    // Check if user is registered by calling userPortfolios
+    console.log('Checking if user is registered...');
+    let isRegistered = false;
+    try {
+      const userPortfolio = await contract.userPortfolios(userAddress);
+      isRegistered = userPortfolio.isActive;
+      console.log('User portfolio status:', {
+        isActive: userPortfolio.isActive,
+        totalValue: userPortfolio.totalValue.toString(),
+        riskLevel: userPortfolio.riskLevel.toString()
+      });
+    } catch (error) {
+      console.log('Error checking user portfolio, assuming not registered:', error);
+      isRegistered = false;
+    }
+    
+    // If user is not registered, register them first
+    if (!isRegistered) {
+      console.log('User not registered, registering with default risk level...');
+      try {
+        const registerTx = await contract.registerUser(3); // Medium risk level (1-5 scale)
+        console.log('Registration transaction sent:', registerTx.hash);
+        
+        // Wait for registration to complete
+        console.log('Waiting for registration to confirm...');
+        const registerReceipt = await registerTx.wait();
+        console.log('Registration confirmed:', registerReceipt);
+        
+        // Double-check registration was successful
+        const userPortfolioAfter = await contract.userPortfolios(userAddress);
+        if (!userPortfolioAfter.isActive) {
+          throw new Error('Registration appeared to succeed but user is still not active');
+        }
+        console.log('Registration verified successful');
+      } catch (registerError) {
+        console.error('Failed to register user:', registerError);
+        throw new Error(`Failed to register user: ${registerError instanceof Error ? registerError.message : 'Unknown error'}`);
+      }
+    }
     
     // Prepare the data for the contract call
     const categories = allocations.map(a => a.id);
@@ -148,7 +211,7 @@ export const updateAllocations = async (allocations: Allocation[]) => {
     
     // Estimate gas first to check if the transaction will succeed
     try {
-      const gasEstimate = await contract.updateAllocations.estimateGas(categories, percentages);
+      const gasEstimate = await contract.updateUserAllocations.estimateGas(categories, percentages);
       console.log('Gas estimate:', gasEstimate.toString());
     } catch (gasError) {
       console.error('Gas estimation failed:', gasError);
@@ -156,7 +219,7 @@ export const updateAllocations = async (allocations: Allocation[]) => {
     }
     
     // Call the contract function with explicit gas limit - ethers v6 syntax
-    const tx = await contract.updateAllocations(categories, percentages, {
+    const tx = await contract.updateUserAllocations(categories, percentages, {
       gasLimit: 300000 // ethers v6 accepts number directly
     });
     
@@ -174,13 +237,15 @@ export const updateAllocations = async (allocations: Allocation[]) => {
 // Hook to read allocations from the contract
 export function usePortfolioAllocations() {
   const contractConfig = getContractConfig('basic');
+  const { address } = useAccount();
   
   const { data, isLoading, isError, refetch } = useContractRead({
     address: contractConfig.address,
     abi: contractConfig.abi,
-    functionName: 'getAllocations',
+    functionName: 'getUserAllocations',
+    args: [address],
     query: {
-      enabled: contractConfig.address !== '0x0000000000000000000000000000000000000000',
+      enabled: contractConfig.address !== '0x0000000000000000000000000000000000000000' && !!address,
     }
   });
   
@@ -189,14 +254,14 @@ export function usePortfolioAllocations() {
     if (!data) return [];
     
     try {
-      const [categories, percentages] = data as [string[], bigint[]];
+      const [categories, percentages, isActive] = data as [string[], bigint[], boolean[]];
       
       return categories.map((category, index) => ({
         id: category,
         name: categoryNames[category] || category,
         color: categoryColors[category] || '#6B7280',
         allocation: Number(percentages[index])
-      }));
+      })).filter((_, index) => isActive[index]); // Only include active allocations
     } catch (error) {
       console.error('Error processing allocation data:', error);
       return [];
@@ -300,7 +365,7 @@ export function useUpdateAllocations() {
       const hash = await writeContractAsync({
         abi: contractConfig.abi,
         address: contractConfig.address,
-        functionName: 'updateAllocations',
+        functionName: 'updateUserAllocations',
         args: [categories, percentages],
         chain: seiTestnet, // Use the fully defined chain object
         account: address
@@ -504,7 +569,7 @@ export function useUserAllocations(userAddress?: string) {
   return {
     data: data ? {
       categories: data[0] as string[],
-      percentages: data[1] as number[],
+      percentages: (data[1] as any[]).map(p => Number(p)), // Convert BigInt array to number array
       isActive: data[2] as boolean[]
     } : null,
     isLoading,
@@ -612,11 +677,11 @@ export function usePortfolioSummary(userAddress?: string) {
 
   return {
     data: data ? {
-      totalValue: data[0] as number,
-      performanceScore: data[1] as number,
-      riskLevel: data[2] as number,
+      totalValue: Number(data[0]),  // Convert BigInt to number safely
+      performanceScore: Number(data[1]),  // Convert BigInt to number safely
+      riskLevel: Number(data[2]),  // Convert BigInt to number safely
       autoRebalance: data[3] as boolean,
-      lastRebalance: data[4] as number
+      lastRebalance: Number(data[4])  // Convert BigInt to number safely
     } : null,
     isLoading,
     isError,
@@ -703,219 +768,281 @@ export const formatWhaleAction = (actionType: number): string => {
   return actionType === 0 ? 'BUY' : 'SELL';
 };
 
-// Utility functions for contract information
-export const getContractInfo = () => {
-  return {
-    core: {
-      address: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
-      name: 'AutoSeiPortfolioCore',
-      description: 'Core portfolio management functions',
-      features: ['Basic allocations', 'User registration', 'Portfolio summary']
-    },
-    full: {
-      address: AUTOSEI_PORTFOLIO_FULL_ADDRESS,
-      name: 'AutoSeiPortfolio',
-      description: 'Full-featured portfolio management with AI signals',
-      features: ['AI signals', 'Trading bots', 'Whale tracking', 'Advanced analytics']
-    }
-  };
-};
-
-// Function to validate contract addresses
-export const validateContractAddresses = () => {
-  const issues = [];
-  
-  if (!AUTOSEI_PORTFOLIO_CORE_ADDRESS || AUTOSEI_PORTFOLIO_CORE_ADDRESS === '0x0000000000000000000000000000000000000000') {
-    issues.push('Core contract address is not configured');
+// Check if user is registered with the contract
+export const checkUserRegistration = async (userAddress: string) => {
+  if (!(window as any).ethereum) {
+    throw new Error('No Ethereum provider found. Please install MetaMask or another wallet.');
   }
   
-  if (!AUTOSEI_PORTFOLIO_FULL_ADDRESS || AUTOSEI_PORTFOLIO_FULL_ADDRESS === '0x0000000000000000000000000000000000000000') {
-    issues.push('Full contract address is not configured');
+  try {
+    const provider = new BrowserProvider((window as any).ethereum);
+    const contractConfig = getContractConfig('basic');
+    
+    const contract = new Contract(
+      contractConfig.address,
+      contractConfig.abi,
+      provider // Read-only, no signer needed
+    );
+    
+    console.log('Checking registration for address:', userAddress);
+    
+    const userPortfolio = await contract.userPortfolios(userAddress);
+    const isRegistered = userPortfolio.isActive;
+    
+    console.log('User registration status:', {
+      address: userAddress,
+      isRegistered,
+      totalValue: userPortfolio.totalValue.toString(),
+      riskLevel: userPortfolio.riskLevel.toString(),
+      lastRebalance: userPortfolio.lastRebalance.toString()
+    });
+    
+    return {
+      isRegistered,
+      portfolio: {
+        totalValue: Number(userPortfolio.totalValue),
+        riskLevel: Number(userPortfolio.riskLevel),
+        lastRebalance: Number(userPortfolio.lastRebalance),
+        autoRebalance: userPortfolio.autoRebalance,
+        performanceScore: Number(userPortfolio.performanceScore)
+      }
+    };
+  } catch (error) {
+    console.error('Error checking user registration:', error);
+    return {
+      isRegistered: false,
+      portfolio: null
+    };
+  }
+};
+
+// Register user with the contract
+export const registerUserWithContract = async (riskLevel: number = 3) => {
+  if (!(window as any).ethereum) {
+    throw new Error('No Ethereum provider found. Please install MetaMask or another wallet.');
   }
   
-  return {
-    isValid: issues.length === 0,
-    issues,
-    addresses: {
-      core: AUTOSEI_PORTFOLIO_CORE_ADDRESS,
-      full: AUTOSEI_PORTFOLIO_FULL_ADDRESS
+  try {
+    await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+    
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    const userAddress = await signer.getAddress();
+    
+    const contractConfig = getContractConfig('basic');
+    const contract = new Contract(
+      contractConfig.address,
+      contractConfig.abi,
+      signer
+    );
+    
+    console.log('Registering user with contract:', {
+      address: userAddress,
+      riskLevel,
+      contractAddress: contractConfig.address
+    });
+    
+    // Call registerUser function
+    const tx = await contract.registerUser(riskLevel, {
+      gasLimit: 200000
+    });
+    
+    console.log('Registration transaction sent:', tx.hash);
+    
+    // Wait for transaction confirmation
+    const receipt = await tx.wait();
+    console.log('Registration confirmed:', receipt);
+    
+    return {
+      hash: tx.hash as `0x${string}`,
+      receipt
+    };
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+
+// Public function to manually register a user with a chosen risk level
+export const registerUserManually = async (riskLevel: number = 3): Promise<{ hash: `0x${string}` }> => {
+  try {
+    const contractConfig = getContractConfig('basic');
+    
+    // Get the provider and signer
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    const userAddress = await signer.getAddress();
+    
+    console.log('Manual registration for user:', userAddress, 'with risk level:', riskLevel);
+    
+    // Create contract instance
+    const contract = new Contract(
+      contractConfig.address,
+      contractConfig.abi,
+      signer
+    );
+    
+    // Check if user is already registered
+    try {
+      const userPortfolio = await contract.userPortfolios(userAddress);
+      if (userPortfolio.isActive) {
+        console.log('User is already registered');
+        throw new Error('User is already registered');
+      }
+    } catch (error) {
+      // If error checking, assume not registered and continue
+      console.log('Proceeding with registration...');
     }
-  };
+    
+    // Register the user
+    const registerTx = await contract.registerUser(riskLevel);
+    console.log('Manual registration transaction sent:', registerTx.hash);
+    
+    // Wait for registration to complete
+    const registerReceipt = await registerTx.wait();
+    console.log('Manual registration confirmed:', registerReceipt);
+    
+    // Verify registration was successful
+    const userPortfolioAfter = await contract.userPortfolios(userAddress);
+    if (!userPortfolioAfter.isActive) {
+      throw new Error('Registration appeared to succeed but user is still not active');
+    }
+    console.log('Manual registration verified successful');
+    
+    return {
+      hash: registerTx.hash as `0x${string}`
+    };
+  } catch (error) {
+    console.error('Error in manual registration:', error);
+    throw error;
+  }
 };
 
-// Log contract configuration for debugging
-export const logContractConfiguration = () => {
-  console.log('=== AutoSei Contract Configuration ===');
-  console.log('Core Contract (AutoSeiPortfolioCore):', AUTOSEI_PORTFOLIO_CORE_ADDRESS);
-  console.log('Full Contract (AutoSeiPortfolio):', AUTOSEI_PORTFOLIO_FULL_ADDRESS);
-  console.log('Mock USDC Contract:', MOCK_USDC_ADDRESS);
-  console.log('Contract validation:', validateContractAddresses());
-  console.log('=====================================');
+// Function to check user registration status
+export const checkUserRegistrationStatus = async (): Promise<{
+  isRegistered: boolean;
+  userAddress: string;
+  riskLevel?: number;
+  totalValue?: string;
+}> => {
+  try {
+    const contractConfig = getContractConfig('basic');
+    
+    // Get the provider and signer
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    const userAddress = await signer.getAddress();
+    
+    // Create contract instance
+    const contract = new Contract(
+      contractConfig.address,
+      contractConfig.abi,
+      signer
+    );
+    
+    // Check user portfolio
+    const userPortfolio = await contract.userPortfolios(userAddress);
+    
+    return {
+      isRegistered: userPortfolio.isActive,
+      userAddress,
+      riskLevel: userPortfolio.isActive ? Number(userPortfolio.riskLevel) : undefined,
+      totalValue: userPortfolio.isActive ? userPortfolio.totalValue.toString() : undefined
+    };
+  } catch (error) {
+    console.error('Error checking user registration status:', error);
+    throw error;
+  }
 };
 
-// USDC Contract Hooks
-// Hook to get USDC balance for a user
+// Make manual functions available globally for debugging
+if (typeof window !== 'undefined') {
+  (window as any).registerUserManually = registerUserManually;
+  (window as any).checkUserRegistrationStatus = checkUserRegistrationStatus;
+}
+
+// USDC-related hooks and functions
 export function useUSDCBalance(address?: `0x${string}`) {
-  return useContractRead({
+  const { data, isLoading, refetch } = useContractRead({
     address: MOCK_USDC_ADDRESS,
     abi: MockUSDCABI,
     functionName: 'balanceOf',
-    args: address ? [address] : undefined,
+    args: [address],
     query: {
-      enabled: !!address && !!MOCK_USDC_ADDRESS,
-      refetchInterval: 10000, // Refetch every 10 seconds
+      enabled: MOCK_USDC_ADDRESS !== '0x0000000000000000000000000000000000000000' && !!address,
     }
   });
+
+  return {
+    data: data ? (data as bigint) : BigInt(0),
+    isLoading,
+    refetch
+  };
 }
 
-// Hook to get USDC token info
 export function useUSDCInfo() {
   const { data: name } = useContractRead({
     address: MOCK_USDC_ADDRESS,
     abi: MockUSDCABI,
     functionName: 'name',
+    query: {
+      enabled: MOCK_USDC_ADDRESS !== '0x0000000000000000000000000000000000000000',
+    }
   });
 
   const { data: symbol } = useContractRead({
     address: MOCK_USDC_ADDRESS,
     abi: MockUSDCABI,
     functionName: 'symbol',
+    query: {
+      enabled: MOCK_USDC_ADDRESS !== '0x0000000000000000000000000000000000000000',
+    }
   });
 
   const { data: decimals } = useContractRead({
     address: MOCK_USDC_ADDRESS,
     abi: MockUSDCABI,
     functionName: 'decimals',
-  });
-
-  const { data: totalSupply } = useContractRead({
-    address: MOCK_USDC_ADDRESS,
-    abi: MockUSDCABI,
-    functionName: 'totalSupply',
+    query: {
+      enabled: MOCK_USDC_ADDRESS !== '0x0000000000000000000000000000000000000000',
+    }
   });
 
   return {
-    name,
-    symbol,
-    decimals,
-    totalSupply,
+    name: name as string,
+    symbol: symbol as string,
+    decimals: decimals as number,
     address: MOCK_USDC_ADDRESS
   };
 }
 
-// Hook to claim free USDC from faucet
 export function useUSDCFaucet() {
-  const { writeContract, isPending, error, isSuccess, data } = useWriteContract();
-  const { address } = useAccount();
-  const chainId = useChainId();
-
-  const claimFaucet = async () => {
-    if (!address) throw new Error('Wallet not connected');
-    if (!MOCK_USDC_ADDRESS || MOCK_USDC_ADDRESS === '0x0000000000000000000000000000000000000000') {
-      throw new Error('USDC contract address not configured');
-    }
-
-    try {
-      console.log('Claiming USDC faucet for address:', address);
-      console.log('USDC contract address:', MOCK_USDC_ADDRESS);
-      console.log('Chain ID:', chainId);
-      
-      // Call writeContract with proper parameters
-      const hash = await writeContract({
-        address: MOCK_USDC_ADDRESS,
-        abi: MockUSDCABI,
-        functionName: 'faucet',
-        args: [],
-        chain: seiTestnet,
-        account: address
-      });
-      
-      console.log('Faucet transaction hash:', hash);
-      return { hash };
-    } catch (error) {
-      console.error('Error claiming USDC faucet:', error);
-      
-      // Enhanced error handling with specific faucet errors
-      if (error instanceof Error) {
-        if (error.message.includes('user rejected')) {
-          throw new Error('Transaction was rejected by user');
-        } else if (error.message.includes('insufficient funds')) {
-          throw new Error('Insufficient SEI for gas fees');
-        } else if (error.message.includes('Already has enough tokens')) {
-          throw new Error('You already have 1000+ USDC. Faucet is limited to accounts with less than 1000 USDC.');
-        } else if (error.message.includes('Exceeds max supply')) {
-          throw new Error('Faucet has reached maximum supply limit');
-        } else if (error.message.includes('execution reverted')) {
-          throw new Error('Contract execution failed. You may already have enough USDC (>1000) or the faucet is empty.');
-        } else if (error.message.includes('awaiting_internal_transactions')) {
-          throw new Error('Transaction is processing. Please wait a moment and check your balance.');
-        }
-      }
-      
-      throw new Error(`Faucet claim failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+  const mintUSDC = async (amount: bigint) => {
+    throw new Error('USDC faucet not implemented');
   };
 
   return {
-    claimFaucet,
-    isPending,
-    error,
-    isSuccess,
-    transaction: data
+    mintUSDC,
+    isPending: false
   };
 }
 
-// Utility function to format USDC amount (6 decimals)
-export function formatUSDCAmount(amount: bigint | undefined, decimals: number = 6): string {
-  if (!amount) return '0.00';
-  
-  const divisor = 10n ** BigInt(decimals);
+// Utility function to format USDC amounts
+export const formatUSDCAmount = (amount: bigint, decimals: number = 6): string => {
+  const divisor = BigInt(10 ** decimals);
   const wholePart = amount / divisor;
   const fractionalPart = amount % divisor;
   
-  // Format to 2 decimal places for display
-  const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
-  const twoDecimals = fractionalStr.slice(0, 2);
+  if (fractionalPart === BigInt(0)) {
+    return wholePart.toString();
+  }
   
-  return `${wholePart}.${twoDecimals}`;
-}
-
-// Utility function to parse USDC amount for transactions
-export function parseUSDCAmount(amount: string, decimals: number = 6): bigint {
-  const [whole, fractional = ''] = amount.split('.');
-  const paddedFractional = fractional.padEnd(decimals, '0').slice(0, decimals);
-  const combined = whole + paddedFractional;
-  return BigInt(combined);
-}
-
-// Utility function to check USDC contract deployment
-export function useUSDCContractStatus() {
-  const { data: name } = useContractRead({
-    address: MOCK_USDC_ADDRESS,
-    abi: MockUSDCABI,
-    functionName: 'name',
-    query: {
-      retry: 1,
-    }
-  });
-
-  const { data: totalSupply } = useContractRead({
-    address: MOCK_USDC_ADDRESS,
-    abi: MockUSDCABI,
-    functionName: 'totalSupply',
-    query: {
-      retry: 1,
-    }
-  });
-
-  const isDeployed = !!name && !!totalSupply;
-  const contractAddress = MOCK_USDC_ADDRESS;
-
-  return {
-    isDeployed,
-    contractAddress,
-    name,
-    totalSupply,
-    isValid: isDeployed && contractAddress !== '0x0000000000000000000000000000000000000000'
-  };
-}
+  const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+  const trimmedFractional = fractionalStr.replace(/0+$/, '');
+  
+  if (trimmedFractional === '') {
+    return wholePart.toString();
+  }
+  
+  return `${wholePart}.${trimmedFractional}`;
+};
