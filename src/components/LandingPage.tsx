@@ -177,7 +177,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                   size="lg" 
                   onClick={handleLaunchApp}
                   disabled={isLoading}
-                  className="neuro-button text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary text-lg px-8 py-6 animate-pulse-glow hover:scale-105 transition-all"
                 >
                   {isLoading ? (
                     <>
