@@ -253,11 +253,11 @@ const PortfolioOverview = () => {
       return;
     }
 
-    // Check if user already has enough USDC
-    if (usdcBalanceNumber >= 1000) {
+    // Check if user already has enough USDC (reduced for testing)
+    if (usdcBalanceNumber >= 500) {
       toast({
         title: "Cannot Claim USDC",
-        description: "You already have 1000+ USDC. The faucet is only available for accounts with less than 1000 USDC.",
+        description: "You already have 500+ USDC. The faucet is only available for accounts with less than 500 USDC.",
         variant: "destructive"
       });
       return;
@@ -276,7 +276,7 @@ const PortfolioOverview = () => {
       
       toast({
         title: "USDC Claimed Successfully! 🎉",
-        description: "1000 USDC has been added to your wallet. It may take a moment to appear in your balance.",
+        description: "100 USDC has been added to your wallet. It may take a moment to appear in your balance.",
       });
       
       console.log('✅ USDC faucet claim successful:', result);
@@ -299,7 +299,7 @@ const PortfolioOverview = () => {
         if (errorMessage.includes('awaiting_internal_transactions')) {
           errorMessage += "\n\nTip: The transaction may still be processing. Please wait a moment and check your balance.";
         } else if (errorMessage.includes('Already has enough tokens')) {
-          errorMessage = "You already have enough USDC (1000+). The faucet is limited to users with less than 1000 USDC.";
+          errorMessage = "You already have enough USDC (500+). The faucet is limited to users with less than 500 USDC.";
         }
       }
       
@@ -434,9 +434,9 @@ const PortfolioOverview = () => {
               </div>
               
               {/* Faucet Button with Better Logic */}
-              {usdcBalanceNumber >= 1000 ? (
+              {usdcBalanceNumber >= 500 ? (
                 <div className="mt-2 text-xs text-green-600 dark:text-green-400">
-                  ✓ Faucet limit reached (1000+ USDC)
+                  ✓ Faucet limit reached (500+ USDC)
                 </div>
               ) : (
                 <Button
@@ -444,12 +444,12 @@ const PortfolioOverview = () => {
                   variant="outline"
                   className="mt-2 h-6 text-xs"
                   onClick={handleClaimUSDC}
-                  disabled={isFaucetPending || !isConnected || usdcBalanceNumber >= 1000}
+                  disabled={isFaucetPending || !isConnected || usdcBalanceNumber >= 500}
                 >
                   {isFaucetPending ? (
                     <RefreshCw className="h-3 w-3 animate-spin" />
                   ) : (
-                    `Claim ${1000 - Math.floor(usdcBalanceNumber)} USDC`
+                    `Claim 100 USDC`
                   )}
                 </Button>
               )}

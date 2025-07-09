@@ -1017,12 +1017,49 @@ export function useUSDCInfo() {
 }
 
 export function useUSDCFaucet() {
-  const mintUSDC = async (amount: bigint) => {
-    throw new Error('USDC faucet not implemented');
+  const { address } = useAccount();
+  
+  const claimFaucet = async () => {
+    if (!address) {
+      throw new Error('Wallet not connected');
+    }
+    
+    // Get the provider and signer
+    const provider = new BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+    
+    // Create contract instance
+    const contract = new Contract(
+      MOCK_USDC_ADDRESS,
+      MockUSDCABI,
+      signer
+    );
+    
+    // 100 USDC = 100 * 10^6 (6 decimals for USDC)
+    const amount = BigInt(100 * 10**6);
+    
+    console.log('Claiming USDC faucet:', {
+      address,
+      amount: amount.toString(),
+      amountFormatted: '100 USDC'
+    });
+    
+    // Call the mint function
+    const tx = await contract.mint(address, amount);
+    console.log('USDC faucet transaction:', tx.hash);
+    
+    // Wait for confirmation
+    const receipt = await tx.wait();
+    console.log('USDC faucet confirmed:', receipt);
+    
+    return {
+      hash: tx.hash,
+      receipt
+    };
   };
 
   return {
-    mintUSDC,
+    claimFaucet,
     isPending: false
   };
 }
