@@ -45,6 +45,14 @@ const WhaleTracker: React.FC = () => {
   const [hasLoadedData, setHasLoadedData] = useState(false);
   const [showThresholdConfig, setShowThresholdConfig] = useState(false);
   const [thresholds, setThresholds] = useState(whaleTrackerService.getWhaleThresholds());
+  const [deepScanLimit, setDeepScanLimit] = useState(500);
+  const [deepScanResults, setDeepScanResults] = useState<{
+    totalScanned: number;
+    whalesFound: number;
+    transactions: WhaleTransaction[];
+  } | null>(null);
+  const [isDeepScanning, setIsDeepScanning] = useState(false);
+  const [showDeepScan, setShowDeepScan] = useState(false);
 
   useEffect(() => {
     // Only load data when component first mounts and we haven't loaded data yet
@@ -135,6 +143,22 @@ const WhaleTracker: React.FC = () => {
     const updated = { ...thresholds, ...newThresholds };
     setThresholds(updated);
     whaleTrackerService.setWhaleThresholds(updated);
+  };
+
+  const performDeepScan = async () => {
+    try {
+      setIsDeepScanning(true);
+      console.log(`Starting deep scan for ${deepScanLimit} transactions...`);
+      
+      const results = await whaleTrackerService.scanForWhaleTransactions(deepScanLimit, 50);
+      setDeepScanResults(results);
+      
+      console.log(`Deep scan complete: ${results.whalesFound} whales found from ${results.totalScanned} transactions`);
+    } catch (error) {
+      console.error('Deep scan failed:', error);
+    } finally {
+      setIsDeepScanning(false);
+    }
   };
 
   return (
@@ -600,8 +624,8 @@ const WhaleTracker: React.FC = () => {
                   
                   {insight.tradingSignal && (
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      insight.tradingSignal === 'buy' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
-                      insight.tradingSignal === 'sell' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
+                      insight.tradingSignal === 'bullish' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
+                      insight.tradingSignal === 'bearish' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
                       insight.tradingSignal === 'caution' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
                       'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                     }`}>
@@ -781,6 +805,120 @@ const WhaleTracker: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Deep Scan Section - Only show when data is loaded */}
+      {hasLoadedData && (
+        <Card className="glass-panel p-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold flex items-center space-x-2 mb-2">
+                <Search className="h-5 w-5 text-primary" />
+                <span>🔍 Deep Whale Scanner</span>
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Scan up to {deepScanLimit.toLocaleString()} recent transactions across major tokens to find hidden whale activity
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex items-center space-x-2">
+                <label className="text-sm text-muted-foreground">Scan Limit:</label>
+                <select
+                  value={deepScanLimit}
+                  onChange={(e) => setDeepScanLimit(Number(e.target.value))}
+                  className="px-3 py-2 border border-border rounded-lg bg-background text-sm"
+                  disabled={isDeepScanning}
+                >
+                  <option value={200}>200 transactions</option>
+                  <option value={500}>500 transactions</option>
+                  <option value={1000}>1,000 transactions</option>
+                </select>
+              </div>
+              
+              <button
+                onClick={() => setShowDeepScan(!showDeepScan)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  showDeepScan 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                {showDeepScan ? 'Hide Scanner' : 'Show Scanner'}
+              </button>
+              
+              <button
+                onClick={performDeepScan}
+                disabled={isDeepScanning}
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
+              >
+                <Search className={`h-4 w-4 ${isDeepScanning ? 'animate-pulse' : ''}`} />
+                <span>{isDeepScanning ? 'Scanning...' : 'Deep Scan'}</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Deep Scan Results */}
+          {showDeepScan && deepScanResults && (
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{deepScanResults.totalScanned.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">Transactions Scanned</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{deepScanResults.whalesFound}</div>
+                  <div className="text-sm text-muted-foreground">Whales Discovered</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {deepScanResults.totalScanned > 0 ? ((deepScanResults.whalesFound / deepScanResults.totalScanned) * 100).toFixed(1) : 0}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">Whale Ratio</div>
+                </div>
+              </div>
+              
+              {deepScanResults.transactions.length > 0 && (
+                <div>
+                  <h4 className="text-md font-semibold mb-3">Top Whales from Deep Scan:</h4>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {deepScanResults.transactions.slice(0, 5).map((tx, index) => (
+                      <div key={tx.hash} className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                        <div className="flex items-center space-x-3">
+                          <div className="text-sm font-medium">#{index + 1}</div>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getImpactColor(tx.impact)}`}>
+                                {tx.whaleType.toUpperCase()}
+                              </span>
+                              <span className="text-sm font-medium">{formatCurrency(tx.amountUSD)}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {formatAddress(tx.from)} → {formatAddress(tx.to)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium">{tx.tokenSymbol}</div>
+                          <div className="text-xs text-muted-foreground">{formatTimeAgo(tx.timestamp)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {deepScanResults.transactions.length > 5 && (
+                    <button
+                      onClick={() => setRecentTransactions(deepScanResults.transactions)}
+                      className="mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm hover:bg-primary/90 transition-colors"
+                    >
+                      View All {deepScanResults.transactions.length} Deep Scan Results
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
       )}
         </>
       )}

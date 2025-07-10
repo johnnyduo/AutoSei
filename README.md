@@ -20,16 +20,18 @@
 
 ## 🌟 Overview
 
-AutoSei is a cutting-edge DeFi portfolio management platform built specifically for the Sei EVM network. It combines advanced artificial intelligence, real-time blockchain analytics, and intuitive user experience to democratize sophisticated portfolio management strategies for DeFi investors.
+AutoSei is a cutting-edge DeFi portfolio management platform built specifically for the Sei EVM network. It combines advanced artificial intelligence, intelligent trading bots, real-time whale tracking, and intuitive user experience to democratize sophisticated portfolio management strategies for DeFi investors.
+
+**AutoSei transforms complex DeFi operations into simple conversations**, enabling users to manage portfolios, deploy trading bots, track whale activities, and optimize yields through natural language interactions with AI.
 
 ### 🎯 Key Highlights
 
-- **🤖 Conversational AI Interface** - Powered by Google Gemini 2.5 Pro
-- **🐋 Real-time Whale Tracking** - Monitor large transactions and market movements
-- **📊 Intelligent Portfolio Management** - AI-driven allocation optimization
-- **⚡ Smart Contract Integration** - On-chain portfolio automation
-- **🔍 Market Intelligence** - Advanced analytics and predictive insights
-- **🎨 Modern UI/UX** - Professional design with light/dark theme support
+- **🤖 Conversational AI Interface** - Powered by Google Gemini 2.5 Flash for intelligent portfolio advice
+- **🐋 Advanced Whale Tracking** - Deep scan up to 1,000 transactions with configurable thresholds ($10K-$1M+)
+- **🤖 Intelligent Trading Bots** - 6 automated strategies with AI-powered signals and risk management
+- **📊 Smart Portfolio Management** - AI-driven allocation across 7 asset categories with on-chain automation
+- **⚡ Real-time Market Intelligence** - Live data from SeiTrace API with predictive analytics
+- **🎨 Professional UI/UX** - Modern dashboard with comprehensive analytics and dark/light themes
 
 ---
 
@@ -94,28 +96,41 @@ AutoSei is a cutting-edge DeFi portfolio management platform built specifically 
 ## ✨ Features
 
 ### 🤖 AI-Powered Portfolio Navigator
-- **Conversational Interface**: Natural language queries for complex DeFi strategies
-- **Smart Allocation**: AI-driven portfolio optimization based on market conditions
+- **Conversational Interface**: Natural language queries for complex DeFi strategies using Google Gemini 2.5 Flash
+- **Smart Allocation**: AI-driven portfolio optimization across 7 asset categories
 - **Risk Assessment**: Intelligent risk analysis and mitigation strategies
-- **Market Insights**: Real-time analysis of market trends and opportunities
+- **Market Insights**: Real-time analysis of market trends and investment opportunities
+- **Strategy Recommendations**: Personalized investment advice based on market conditions
 
-### 🐋 Whale Activity Tracker
-- **Transaction Monitoring**: Real-time tracking of large transactions
-- **Market Impact Analysis**: Predictive insights on market movements
-- **Historical Data**: Comprehensive whale activity patterns
-- **Alert System**: Notifications for significant market events
+### 🐋 Advanced Whale Activity Tracker
+- **Real-time Monitoring**: Live tracking of large transactions (≥$10K configurable thresholds)
+- **Deep Scanner**: Scan up to 1,000 recent transactions to discover hidden whale activity
+- **Market Impact Analysis**: AI-powered predictive insights on price movements
+- **Configurable Thresholds**: Customize whale detection from $10K to $1M+ transactions
+- **Risk Alerts**: Automated alerts for potential market manipulation and unusual activities
+- **Historical Patterns**: Comprehensive whale behavior analysis and trends
 
-### 📊 Portfolio Management
-- **7 Asset Categories**: AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin
-- **Smart Contract Integration**: On-chain portfolio automation
-- **Performance Analytics**: Detailed portfolio performance tracking
-- **Yield Optimization**: Compare and optimize DeFi protocol yields
+### 🤖 Intelligent Trading Bots Dashboard
+- **Multiple Bot Strategies**: Momentum, Mean Reversion, Arbitrage, Yield Farming, Grid Trading, DCA
+- **AI-Powered Signals**: Machine learning algorithms for entry/exit decisions
+- **Risk Management**: Advanced position sizing, stop-loss, and portfolio protection
+- **Performance Analytics**: Real-time P&L tracking, Sharpe ratio, and risk metrics
+- **Backtesting Engine**: Historical strategy performance validation
+- **Portfolio Integration**: Bots work seamlessly with portfolio allocation system
 
-### 🎯 Trading Strategies Hub
-- **Multiple Strategies**: Momentum, mean reversion, arbitrage, yield farming
-- **AI Signals**: Machine learning-powered trading signals
-- **Risk Management**: Advanced risk controls and position sizing
-- **Backtesting**: Historical strategy performance analysis
+### 📊 Automated Portfolio Management
+- **7 Asset Categories**: AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin with dynamic allocation
+- **Smart Contract Automation**: On-chain portfolio rebalancing and execution
+- **Performance Tracking**: Detailed analytics with benchmark comparisons
+- **Yield Optimization**: Automatic discovery and comparison of DeFi protocol yields
+- **Risk Controls**: Built-in circuit breakers and emergency stop mechanisms
+
+### 🎯 Professional Trading Strategies Hub
+- **Strategy Marketplace**: Curated collection of proven DeFi trading strategies
+- **Custom Strategy Builder**: Create and backtest your own trading algorithms
+- **Social Trading**: Follow and copy successful traders' strategies
+- **Risk-Adjusted Returns**: Comprehensive performance metrics and analytics
+- **Multi-Asset Support**: Trade across 50+ tokens on Sei EVM ecosystem
 
 ### 🔍 Market Intelligence
 - **50+ Supported Tokens**: Comprehensive token coverage on Sei EVM
@@ -155,8 +170,9 @@ cp .env.example .env
 Edit `.env` file with your configuration:
 ```env
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_SEITRACE_API_KEY=your_seitrace_api_key_here
 VITE_COINGECKO_API_URL=https://api.coingecko.com/api/v3
-VITE_SEITRACE_API_URL=https://seitrace.com/api
+VITE_SEITRACE_API_URL=https://seitrace.com/insights/api
 ```
 
 4. **Start development server**
@@ -176,6 +192,12 @@ npm run build
 2. Create a new API key
 3. Add it to your `.env` file as `VITE_GEMINI_API_KEY`
 
+#### SeiTrace API Key (For Whale Tracking)
+1. Visit [SeiTrace API](https://seitrace.com/api)
+2. Sign up for an API key for enhanced whale tracking features
+3. Add it to your `.env` file as `VITE_SEITRACE_API_KEY`
+4. Note: Basic whale tracking works without API key using mock data
+
 ---
 
 ## 📱 Usage
@@ -186,24 +208,33 @@ Connect your MetaMask or compatible Web3 wallet to the Sei EVM testnet.
 ### 2. **Portfolio Setup**
 - Navigate to the Dashboard
 - Use AI chat to discuss your investment goals
-- Adjust portfolio allocations across 7 asset categories
-- Deploy smart contract for automated management
+- Adjust portfolio allocations across 7 asset categories (AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin)
+- Deploy smart contract for automated portfolio management
 
-### 3. **AI Interaction**
-- Ask questions in natural language
-- Get personalized investment advice
-- Receive market insights and alerts
-- Analyze whale activities and market trends
+### 3. **AI-Powered Analysis**
+- Ask questions in natural language about DeFi strategies
+- Get personalized investment advice based on market conditions
+- Receive real-time market insights and trend analysis
+- Access AI-powered risk assessments and recommendations
 
-### 4. **Trading Strategies**
-- Explore available trading strategies
-- Configure parameters and risk settings
-- Monitor performance and adjust as needed
+### 4. **Trading Bots Management**
+- **Launch Trading Bots**: Choose from 6 strategies (Momentum, Mean Reversion, Arbitrage, Yield Farming, Grid Trading, DCA)
+- **Configure Parameters**: Set risk levels, position sizes, and strategy-specific settings
+- **Monitor Performance**: Real-time P&L tracking with comprehensive analytics
+- **Risk Management**: Automated stop-loss, take-profit, and portfolio protection
 
-### 5. **Whale Tracking**
-- Monitor real-time whale activities
-- Set up alerts for significant transactions
-- Analyze market impact predictions
+### 5. **Advanced Whale Tracking**
+- **Real-time Monitoring**: Track whale transactions with configurable thresholds ($10K-$1M+)
+- **Deep Scanner**: Scan up to 1,000 recent transactions across major tokens
+- **Risk Alerts**: Receive AI-powered alerts for market manipulation and unusual activities
+- **Market Impact Analysis**: Understand how whale movements affect token prices
+- **Historical Patterns**: Analyze whale behavior trends and accumulation patterns
+
+### 6. **Strategies Marketplace**
+- Browse curated DeFi strategies with historical performance data
+- Compare yield farming opportunities across protocols
+- Access professional-grade trading algorithms
+- Follow successful traders and copy their strategies
 
 ---
 
@@ -228,15 +259,23 @@ Connect your MetaMask or compatible Web3 wallet to the Sei EVM testnet.
 ### Architecture
 AutoSei employs a sophisticated multi-layered AI system:
 
-- **🔮 Large Language Models**: Google Gemini 2.5 Pro for natural language understanding
-- **📊 Pattern Recognition**: Advanced algorithms for market trend identification
-- **⚙️ Rule-Based Systems**: Financial safety and compliance enforcement
-- **🔗 On-Chain Analysis**: Blockchain intelligence and whale monitoring
+- **🔮 Large Language Models**: Google Gemini 2.5 Flash for natural language understanding and financial analysis
+- **🤖 Trading Intelligence**: Machine learning algorithms for bot strategy optimization and signal generation
+- **📊 Pattern Recognition**: Advanced algorithms for market trend identification and whale behavior analysis
+- **⚙️ Rule-Based Systems**: Financial safety, risk management, and compliance enforcement
+- **🔗 On-Chain Analysis**: Real-time blockchain intelligence, whale monitoring, and transaction analysis
 
 ### Data Sources
-- **🔗 On-Chain Data**: SeiTrace Explorer API, smart contract events, whale movements
-- **📈 Market Data**: CoinGecko API for prices, market caps, and sentiment
-- **🔒 Privacy**: Only public blockchain data used; user data processed locally
+- **🔗 On-Chain Data**: SeiTrace Explorer API integration for real-time transaction monitoring and whale tracking
+- **📈 Market Data**: CoinGecko API for comprehensive price feeds, market caps, and sentiment indicators
+- **🤖 Trading Signals**: AI-generated signals from technical analysis, whale movements, and market sentiment
+- **🔒 Privacy**: Only public blockchain data used; user portfolio data processed locally
+
+### AI-Powered Features
+- **Conversational Portfolio Advice**: Natural language processing for investment strategy discussions
+- **Trading Bot Intelligence**: Machine learning models for automated trading decisions and risk management
+- **Whale Impact Prediction**: AI analysis of large transactions and their potential market effects
+- **Dynamic Risk Assessment**: Real-time portfolio risk evaluation and adjustment recommendations
 
 ### Prompt Engineering
 - Dynamic, context-aware prompts for financial analysis
@@ -279,18 +318,22 @@ AutoSei employs a sophisticated multi-layered AI system:
 
 ## 🗺️ Roadmap
 
-### 🎯 Q1 2025 - Foundation
-- [x] MVP Development
-- [x] AI Integration (Google Gemini 2.5 Pro)
+### 🎯 Q1 2025 - Foundation ✅ COMPLETED
+- [x] MVP Development with Professional UI/UX
+- [x] AI Integration (Google Gemini 2.5 Flash)
 - [x] Sei EVM Testnet Deployment
-- [x] Basic Portfolio Management
-- [x] Whale Tracking System
+- [x] Advanced Portfolio Management (7 Asset Categories)
+- [x] **Intelligent Trading Bots Dashboard** (6 Strategies)
+- [x] **Enhanced Whale Tracking System** (Deep Scanner up to 1,000 transactions)
+- [x] **AI-Powered Risk Analysis** and Market Intelligence
+- [x] **Real-time SeiTrace API Integration**
 
 ### 🚀 Q2 2025 - Enhancement
-- [ ] Advanced AI Features
-- [ ] Enhanced Data Visualization
-- [ ] Additional DeFi Protocol Integrations
+- [ ] Advanced Trading Bot Strategies (Social Trading, Copy Trading)
+- [ ] Enhanced Data Visualization and Analytics Dashboard
+- [ ] Additional DeFi Protocol Integrations (Yield Farming Optimization)
 - [ ] Mobile App Development
+- [ ] **Strategy Marketplace** with Community Features
 - [ ] Community Features
 
 ### 🌟 Q3 2025 - Expansion

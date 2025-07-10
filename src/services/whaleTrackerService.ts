@@ -1,7 +1,7 @@
 // src/services/whaleTrackerService.ts
 // Professional Whale Tracker Service with AI Analysis for SeiTrace API
 
-import { seiTraceMockService } from './seiTraceMockService';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface WhaleTransaction {
   hash: string;
@@ -49,428 +49,419 @@ export interface TokenWhaleAnalysis {
   averageWhaleHolding: number;
   recentWhaleActivity: WhaleTransaction[];
   priceImpactRisk: 'low' | 'medium' | 'high' | 'critical';
-  manipulationRisk: number; // 0-100 scale
-  liquidityHealth: 'excellent' | 'good' | 'fair' | 'poor';
+  manipulationRisk: number; // 0-100 percentage
+  liquidityHealth: 'poor' | 'fair' | 'good' | 'excellent';
+  topWhales: WhaleAddress[];
 }
 
 export interface WhaleInsight {
   id: string;
-  type: 'accumulation' | 'distribution' | 'manipulation' | 'liquidity_event' | 'smart_money';
+  type: 'accumulation' | 'distribution' | 'smart_money' | 'manipulation' | 'liquidity_event' | 'defi_movement' | 'arbitrage';
   title: string;
   description: string;
-  severity: 'info' | 'warning' | 'critical';
-  confidence: number; // 0-100
-  relatedAddresses: string[];
-  relatedTokens: string[];
-  timestamp: number;
+  severity: 'critical' | 'warning' | 'info';
+  confidence: number; // 0-100 percentage
+  tradingSignal: 'bullish' | 'bearish' | 'neutral' | 'caution';
   aiReasoning: string;
-  tradingSignal?: 'buy' | 'sell' | 'hold' | 'caution';
   expectedImpact: string;
+  timeframe?: 'short' | 'medium' | 'long';
+  timestamp: number;
+  relatedAddresses: string[];
+}
+
+export interface RiskAlert {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+  confidence: number;
+  timestamp: number;
+  relatedTransactions: string[];
 }
 
 export interface WhaleAlerts {
   largeTransfers: WhaleTransaction[];
   newWhales: WhaleAddress[];
-  unusualActivity: WhaleInsight[];
-  riskAlerts: WhaleInsight[];
+  unusualActivity: any[];
+  riskAlerts: RiskAlert[];
+}
+
+// SeiTrace API Response Types
+interface SeiTraceTokenTransfer {
+  amount: string;
+  token_usd_price: string | null;
+  total_usd_value: string | null;
+  from: {
+    address_hash: string;
+    address_association: any;
+  };
+  to: {
+    address_hash: string;
+    address_association: any;
+  };
+  timestamp: string;
+  raw_amount: string;
+  tx_hash: string;
+  action: string;
+  block_height: string;
+  token_info: {
+    token_contract?: string;
+    token_denom?: string;
+    token_symbol: string;
+    token_name: string;
+    token_id: string;
+    token_logo: string | null;
+    token_decimals: string;
+    token_association: any;
+    token_type: string;
+  };
+}
+
+interface SeiTraceResponse {
+  items: SeiTraceTokenTransfer[];
+  next_page_params: any;
+}
+
+interface SeiTraceTokenHolder {
+  wallet_address: {
+    address_hash: string;
+    address_association: any;
+  };
+  raw_amount: string;
+  amount: string;
+  token_usd_price: string | null;
+  total_usd_value: string | null;
+  token_contract: string;
+  token_symbol: string;
+  token_name: string;
+  token_decimals: string;
+  token_logo: string;
+  token_type: string;
+  token_association: any;
 }
 
 class WhaleTrackerService {
-  private apiKey: string;
-  private baseUrl = 'https://seitrace.com/insights/api/v2';
-  private chainId = 'pacific-1'; // Sei mainnet for real whale activity
-  private useMockData = false;
-  
-  // Rate limiting properties
-  private requestQueue: Array<() => Promise<any>> = [];
-  private isProcessingQueue = false;
-  private lastRequestTime = 0;
-  private requestCount = 0;
-  private readonly MAX_REQUESTS_PER_MINUTE = 45; // Stay under 50 limit
-  private readonly MIN_REQUEST_INTERVAL = 1500; // 1.5 seconds between requests
-
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
-  private readonly CACHE_DURATION = 60000; // 1 minute cache
-
-  private rateLimitReset = Date.now() + 60000; // Reset counter every minute
-  
-  // Configurable whale thresholds (in USD)
-  private whaleThresholds = {
-    mega: 10000000,    // $10M+ - Mega Whale
-    large: 1000000,    // $1M+ - Large Whale  
-    medium: 100000,    // $100K+ - Medium Whale
-    small: 50000       // $50K+ - Small Whale (increased for mainnet)
+  private gemini: GoogleGenerativeAI;
+  private mockDataMode = false;
+  private rateLimitInfo = {
+    requestsUsed: 0,
+    requestsRemaining: 1000,
+    resetTime: Date.now() + 3600000, // 1 hour from now
   };
 
-  // Minimum transaction value to be considered for whale tracking
-  private readonly MIN_WHALE_TRANSACTION_USD = 50000; // $50K minimum
+  // Whale thresholds in USD
+  private thresholds = {
+    small: 10000,    // $10K
+    medium: 50000,   // $50K  
+    large: 250000,   // $250K
+    mega: 1000000    // $1M
+  };
+
+  // Major token contracts on Sei for whale tracking
+  private readonly MAJOR_TOKEN_CONTRACTS = {
+    // ERC20 tokens on Sei EVM - these are real contracts on Sei pacific-1 mainnet
+    erc20: [
+      '0x3894085Ef7Ff0f0aeDf52E2A2704928d259C2fc7', // WSEI (Wrapped SEI)
+      '0x0c78d371EB4F8c082E8CD23c2Fa321b915E1BBfA', // Example token from docs
+    ],
+  };
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_SEI_EXPLORER_API_KEY;
-    if (!this.apiKey) {
-      console.warn('SeiTrace API key not found, using enhanced mock data');
-      this.useMockData = true;
-    }
+    const apiKey = typeof window !== 'undefined' 
+      ? (window as any).ENV?.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY
+      : process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     
-    // Reset rate limit counter every minute
-    setInterval(() => {
-      this.requestCount = 0;
-      this.rateLimitReset = Date.now() + 60000;
-    }, 60000);
+    this.gemini = new GoogleGenerativeAI(apiKey || '');
   }
 
-  private async waitForRateLimit(): Promise<void> {
-    const now = Date.now();
-    
-    // Reset counter if a minute has passed
-    if (now >= this.rateLimitReset) {
-      this.requestCount = 0;
-      this.rateLimitReset = now + 60000;
-    }
-    
-    // Check if we've hit the rate limit
-    if (this.requestCount >= this.MAX_REQUESTS_PER_MINUTE) {
-      const waitTime = this.rateLimitReset - now;
-      console.log(`Rate limit reached, waiting ${waitTime}ms`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-      this.requestCount = 0;
-      this.rateLimitReset = Date.now() + 60000;
-    }
-    
-    // Ensure minimum interval between requests
-    const timeSinceLastRequest = now - this.lastRequestTime;
-    if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
-      const waitTime = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-    }
-  }
-
-  private getCacheKey(endpoint: string, params: Record<string, any>): string {
-    return `${endpoint}:${JSON.stringify(params)}`;
-  }
-
-  private getFromCache(cacheKey: string): any | null {
-    const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      return cached.data;
-    }
-    return null;
-  }
-
-  private setCache(cacheKey: string, data: any): void {
-    this.cache.set(cacheKey, {
-      data,
-      timestamp: Date.now()
-    });
-  }
-
-  private async makeRequest(endpoint: string, params: Record<string, any> = {}): Promise<any> {
-    const cacheKey = this.getCacheKey(endpoint, params);
-    
-    // Check cache first
-    const cachedData = this.getFromCache(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
-
-    if (this.useMockData) {
-      const mockData = this.getMockData(endpoint, params);
-      this.setCache(cacheKey, mockData);
-      return mockData;
-    }
-
+  private async makeRequest(url: string, options: RequestInit = {}): Promise<any> {
     try {
-      // Wait for rate limiting
-      await this.waitForRateLimit();
+      console.log('Making SeiTrace request to:', url);
       
-      const queryParams = new URLSearchParams({
-        chain_id: this.chainId,
-        ...params
-      });
+      const apiKey = typeof window !== 'undefined' 
+        ? (window as any).ENV?.VITE_SEITRACE_API_KEY || import.meta.env.VITE_SEITRACE_API_KEY
+        : process.env.NEXT_PUBLIC_SEITRACE_API_KEY || process.env.VITE_SEITRACE_API_KEY;
 
-      this.requestCount++;
-      this.lastRequestTime = Date.now();
+      if (!apiKey) {
+        throw new Error('SeiTrace API key not found');
+      }
 
-      const response = await fetch(`${this.baseUrl}${endpoint}?${queryParams}`, {
+      const response = await fetch(url, {
+        ...options,
         headers: {
-          'X-Api-Key': this.apiKey,
           'Content-Type': 'application/json',
+          'X-Api-Key': apiKey,
+          ...options.headers,
         },
       });
 
+      this.rateLimitInfo.requestsUsed++;
+      this.rateLimitInfo.requestsRemaining = Math.max(0, this.rateLimitInfo.requestsRemaining - 1);
+
       if (!response.ok) {
-        console.warn(`SeiTrace API error: ${response.status}, falling back to mock data`);
-        this.useMockData = true;
-        const mockData = this.getMockData(endpoint, params);
-        this.setCache(cacheKey, mockData);
-        return mockData;
+        const errorText = await response.text();
+        console.error(`SeiTrace API error: ${response.status}`, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
-      this.setCache(cacheKey, data);
+      console.log('SeiTrace response received:', data?.items?.length || 0, 'items');
       return data;
     } catch (error) {
-      console.error('SeiTrace API request failed:', error);
-      this.useMockData = true;
-      const mockData = this.getMockData(endpoint, params);
-      this.setCache(cacheKey, mockData);
-      return mockData;
-    }
-  }
-
-  private async getMockData(endpoint: string, params: Record<string, any>): Promise<any> {
-    // Enhanced mock data generation using existing service
-    if (endpoint.includes('/token/erc20/transfers')) {
-      const transfers = await seiTraceMockService.getTokenTransfers(
-        params.contract_address || '0x9d5F1273002Cc4DAC76B72249ed59B21Ba41D526',
-        parseInt(params.limit) || 50
-      );
-      return { items: transfers };
-    } else if (endpoint.includes('/token/erc20/holders')) {
-      const holders = await seiTraceMockService.getTokenHolders(
-        params.contract_address || '0x9d5F1273002Cc4DAC76B72249ed59B21Ba41D526',
-        parseInt(params.limit) || 50
-      );
-      return { items: holders };
-    } else if (endpoint.includes('/addresses')) {
-      return await seiTraceMockService.getAddressInfo(params.address || '0x0');
-    }
-    
-    return { items: [] };
-  }
-
-  // Get recent whale transactions across all tokens on mainnet
-  async getRecentWhaleTransactions(limit = 50): Promise<WhaleTransaction[]> {
-    try {
-      // Get recent large transactions from mainnet
-      // Note: We'll use a general transactions endpoint to find large transfers
-      const response = await this.makeRequest('/transactions/latest', {
-        limit: Math.min(limit * 3, 150), // Get more to filter for whales
-        min_value_usd: this.MIN_WHALE_TRANSACTION_USD, // Only get transactions above threshold
-      });
-
-      const transactions = this.processMainnetTransactions(response.items || []);
-      
-      // Sort by USD value and timestamp, filter for whales
-      return transactions
-        .filter(tx => tx.isWhale && tx.amountUSD >= this.MIN_WHALE_TRANSACTION_USD)
-        .sort((a, b) => {
-          // Sort by impact level first, then by timestamp
-          const impactOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-          const aImpact = impactOrder[a.impact] || 0;
-          const bImpact = impactOrder[b.impact] || 0;
-          
-          if (aImpact !== bImpact) return bImpact - aImpact;
-          return b.timestamp - a.timestamp;
-        })
-        .slice(0, limit);
-    } catch (error) {
-      console.error('Error fetching whale transactions:', error);
-      // Fallback to mock data with realistic mainnet-like transactions
-      return this.generateMainnetMockTransactions(limit);
-    }
-  }
-
-  // Process mainnet transactions to identify whale activity
-  private processMainnetTransactions(transactions: any[]): WhaleTransaction[] {
-    return transactions.map(tx => {
-      const amountUSD = this.parseTransactionValue(tx);
-      const whaleTier = this.getWhaleTier(amountUSD);
-      const impact = this.getImpactLevel(amountUSD);
-
-      return {
-        hash: tx.hash || this.generateTxHash(),
-        from: tx.from || this.generateAddress(),
-        to: tx.to || this.generateAddress(),
-        amount: tx.amount || (amountUSD / 0.12).toString(), // Estimate SEI amount
-        amountUSD,
-        timestamp: tx.timestamp ? new Date(tx.timestamp).getTime() : Date.now(),
-        blockNumber: tx.block_number || Math.floor(Math.random() * 1000000),
-        tokenAddress: tx.token_address || '0x0000000000000000000000000000000000000000',
-        tokenSymbol: tx.token_symbol || 'SEI',
-        tokenName: tx.token_name || 'Sei Network',
-        tokenDecimals: tx.token_decimals || 6,
-        type: this.determineTransactionType(tx),
-        impact,
-        gasUsed: tx.gas_used || '21000',
-        gasPrice: tx.gas_price || '1000000000',
-        isWhale: whaleTier !== null,
-        whaleType: whaleTier || 'small',
-        confidenceScore: this.calculateConfidenceScore(amountUSD, tx),
-      };
-    }).filter(tx => tx.isWhale);
-  }
-
-  // Generate realistic mainnet-like mock transactions when API fails
-  private generateMainnetMockTransactions(limit: number): WhaleTransaction[] {
-    const transactions: WhaleTransaction[] = [];
-    const tokens = [
-      { symbol: 'SEI', name: 'Sei Network', address: '0x0000000000000000000000000000000000000000' },
-      { symbol: 'USDC', name: 'USD Coin', address: '0xa0b86a33e6c8f4bf4e6c4b4de7e50c23' },
-      { symbol: 'USDT', name: 'Tether USD', address: '0xdac17f958d2ee523a2206206994597c1' },
-      { symbol: 'WETH', name: 'Wrapped Ethereum', address: '0xc02aaa39b223fe8d0a0e5c4f27ead90' },
-    ];
-
-    for (let i = 0; i < limit; i++) {
-      const token = tokens[Math.floor(Math.random() * tokens.length)];
-      const whaleTier = this.getRandomWhaleTier();
-      const baseAmount = this.whaleThresholds[whaleTier];
-      const randomMultiplier = 1 + Math.random() * 2; // 1x to 3x the base amount
-      const amountUSD = baseAmount * randomMultiplier;
-      
-      transactions.push({
-        hash: this.generateTxHash(),
-        from: this.generateAddress(),
-        to: this.generateAddress(),
-        amount: (amountUSD / 0.12).toString(), // Estimate token amount
-        amountUSD,
-        timestamp: Date.now() - Math.random() * 24 * 60 * 60 * 1000, // Last 24h
-        blockNumber: Math.floor(Math.random() * 1000000),
-        tokenAddress: token.address,
-        tokenSymbol: token.symbol,
-        tokenName: token.name,
-        tokenDecimals: token.symbol === 'SEI' ? 6 : 18,
-        type: Math.random() > 0.5 ? 'transfer' : (Math.random() > 0.5 ? 'buy' : 'sell'),
-        impact: this.getImpactLevel(amountUSD),
-        gasUsed: '21000',
-        gasPrice: '1000000000',
-        isWhale: true,
-        whaleType: whaleTier,
-        confidenceScore: 85 + Math.random() * 15, // 85-100%
-      });
-    }
-
-    return transactions.sort((a, b) => b.timestamp - a.timestamp);
-  }
-
-  // Get whale analysis based on mainnet transaction patterns
-  async getTokenWhaleAnalysis(tokenAddress: string): Promise<TokenWhaleAnalysis> {
-    try {
-      // For mainnet whale tracking, we analyze overall large transaction patterns
-      // instead of specific token holders (which may not exist for testnet contracts)
-      const recentTransactions = await this.getRecentWhaleTransactions(100);
-      
-      // Filter transactions related to this token if it's a real mainnet token
-      const tokenTransactions = recentTransactions.filter(tx => 
-        tx.tokenAddress.toLowerCase() === tokenAddress.toLowerCase() ||
-        tx.tokenSymbol === 'SEI' // Include SEI transactions as baseline
-      );
-      
-      if (tokenTransactions.length === 0) {
-        // If no specific token transactions, return general mainnet whale analysis
-        return this.generateMainnetWhaleAnalysis(recentTransactions);
-      }
-
-      // Analyze whale concentration based on transaction patterns
-      const uniqueWhaleAddresses = new Set([
-        ...tokenTransactions.map(tx => tx.from),
-        ...tokenTransactions.map(tx => tx.to)
-      ]);
-
-      const totalWhaleVolume = tokenTransactions.reduce((sum, tx) => sum + tx.amountUSD, 0);
-      const whaleConcentration = this.calculateWhaleConcentration(tokenTransactions);
-
-      return {
-        tokenAddress,
-        tokenSymbol: tokenTransactions[0]?.tokenSymbol || 'MAINNET',
-        tokenName: tokenTransactions[0]?.tokenName || 'Mainnet Whale Activity',
-        whaleConcentration,
-        whaleCount: uniqueWhaleAddresses.size,
-        averageWhaleHolding: totalWhaleVolume / Math.max(uniqueWhaleAddresses.size, 1),
-        recentWhaleActivity: tokenTransactions.slice(0, 20),
-        priceImpactRisk: this.assessPriceImpactFromTransactions(tokenTransactions),
-        manipulationRisk: this.calculateManipulationFromTransactions(tokenTransactions),
-        liquidityHealth: this.assessLiquidityFromActivity(recentTransactions, tokenTransactions),
-      };
-    } catch (error) {
-      console.error(`Error analyzing whale activity for ${tokenAddress}:`, error);
-      // Return mock analysis as fallback
-      return this.generateMainnetWhaleAnalysis([]);
-    }
-  }
-
-  private generateMainnetWhaleAnalysis(transactions: WhaleTransaction[]): TokenWhaleAnalysis {
-    const mockTransactions = transactions.length > 0 ? transactions.slice(0, 20) : this.generateMainnetMockTransactions(20);
-    
-    return {
-      tokenAddress: '0x0000000000000000000000000000000000000000',
-      tokenSymbol: 'MAINNET',
-      tokenName: 'Mainnet Whale Activity',
-      whaleConcentration: 65 + Math.random() * 20, // 65-85%
-      whaleCount: 15 + Math.floor(Math.random() * 10), // 15-25 whales
-      averageWhaleHolding: 500000 + Math.random() * 1000000, // $500K - $1.5M average
-      recentWhaleActivity: mockTransactions,
-      priceImpactRisk: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as any,
-      manipulationRisk: 20 + Math.random() * 40, // 20-60%
-      liquidityHealth: ['fair', 'good', 'excellent'][Math.floor(Math.random() * 3)] as any,
-    };
-  }
-
-  private calculateWhaleConcentration(transactions: WhaleTransaction[]): number {
-    if (transactions.length === 0) return 0;
-    
-    // Calculate concentration based on how much large transactions dominate
-    const largeTransactions = transactions.filter(tx => tx.amountUSD >= this.whaleThresholds.large);
-    const totalVolume = transactions.reduce((sum, tx) => sum + tx.amountUSD, 0);
-    const largeVolume = largeTransactions.reduce((sum, tx) => sum + tx.amountUSD, 0);
-    
-    return totalVolume > 0 ? (largeVolume / totalVolume) * 100 : 0;
-  }
-
-  // Get detailed whale address information
-  async getWhaleAddressDetails(address: string): Promise<WhaleAddress> {
-    try {
-      const addressInfo = await this.makeRequest('/addresses', { address });
-      const tokenBalances = await this.makeRequest('/token/erc20/balances', { address });
-
-      return this.processWhaleAddress(addressInfo, tokenBalances.items || []);
-    } catch (error) {
-      console.error(`Error fetching whale details for ${address}:`, error);
+      console.error('SeiTrace request failed:', error);
       throw error;
     }
   }
 
-  // Get AI-powered whale insights
-  async getWhaleInsights(): Promise<WhaleInsight[]> {
-    const insights: WhaleInsight[] = [];
+  private mapSeiTraceToWhaleTransaction(transfer: SeiTraceTokenTransfer): WhaleTransaction {
+    const usdValue = transfer.total_usd_value ? parseFloat(transfer.total_usd_value) : 0;
+    const amount = transfer.amount || '0';
+    const decimals = parseInt(transfer.token_info.token_decimals || '18');
     
-    try {
-      // Analyze recent whale activity
-      const recentTransactions = await this.getRecentWhaleTransactions(100);
-      
-      // Generate insights based on patterns
-      insights.push(...this.generateAccumulationInsights(recentTransactions));
-      insights.push(...this.generateDistributionInsights(recentTransactions));
-      insights.push(...this.generateSmartMoneyInsights(recentTransactions));
-      insights.push(...this.generateRiskInsights(recentTransactions));
+    return {
+      hash: transfer.tx_hash,
+      from: transfer.from.address_hash,
+      to: transfer.to.address_hash,
+      amount,
+      amountUSD: usdValue,
+      timestamp: new Date(transfer.timestamp).getTime(),
+      blockNumber: parseInt(transfer.block_height || '0'),
+      tokenAddress: transfer.token_info.token_contract || transfer.token_info.token_denom || '',
+      tokenSymbol: transfer.token_info.token_symbol || 'UNKNOWN',
+      tokenName: transfer.token_info.token_name || 'Unknown Token',
+      tokenDecimals: decimals,
+      type: this.determineTransactionType(transfer),
+      impact: this.calculateImpact(usdValue),
+      gasUsed: '0', // Not available in token transfer data
+      gasPrice: '0',
+      isWhale: usdValue >= this.thresholds.small,
+      whaleType: this.getWhaleType(usdValue),
+      confidenceScore: this.calculateConfidenceScore(transfer, usdValue),
+    };
+  }
 
-      return insights.sort((a, b) => b.confidence - a.confidence);
+  private determineTransactionType(transfer: SeiTraceTokenTransfer): 'buy' | 'sell' | 'transfer' {
+    return 'transfer';
+  }
+
+  private calculateImpact(usdValue: number): 'critical' | 'high' | 'medium' | 'low' {
+    if (usdValue >= this.thresholds.mega) return 'critical';
+    if (usdValue >= this.thresholds.large) return 'high';
+    if (usdValue >= this.thresholds.medium) return 'medium';
+    return 'low';
+  }
+
+  private getWhaleType(usdValue: number): 'mega' | 'large' | 'medium' | 'small' {
+    if (usdValue >= this.thresholds.mega) return 'mega';
+    if (usdValue >= this.thresholds.large) return 'large';
+    if (usdValue >= this.thresholds.medium) return 'medium';
+    return 'small';
+  }
+
+  private calculateConfidenceScore(transfer: SeiTraceTokenTransfer, usdValue: number): number {
+    let confidence = 50; // Base confidence
+    
+    // Higher confidence for larger USD values
+    if (usdValue >= this.thresholds.mega) confidence += 30;
+    else if (usdValue >= this.thresholds.large) confidence += 20;
+    else if (usdValue >= this.thresholds.medium) confidence += 10;
+    
+    // Higher confidence if we have USD price data
+    if (transfer.token_usd_price) confidence += 20;
+    
+    return Math.min(100, confidence);
+  }
+
+  async getRecentWhaleTransactions(limit: number = 20): Promise<WhaleTransaction[]> {
+    try {
+      console.log('Fetching recent whale transactions...');
+      const allTransactions: WhaleTransaction[] = [];
+      
+      // 1. Fetch large batch of recent transactions from major ERC20 contracts using pagination
+      for (const contractAddress of this.MAJOR_TOKEN_CONTRACTS.erc20.slice(0, 2)) {
+        try {
+          // Fetch multiple pages to get more transactions to analyze
+          const maxPages = 4; // Fetch up to 200 transactions (50 * 4)
+          for (let page = 0; page < maxPages; page++) {
+            const offset = page * 50;
+            const url = `https://seitrace.com/insights/api/v2/token/erc20/transfers?chain_id=pacific-1&contract_address=${contractAddress}&limit=50&offset=${offset}`;
+            
+            try {
+              const data: SeiTraceResponse = await this.makeRequest(url);
+              
+              if (data && data.items && data.items.length > 0) {
+                // Filter for whale transactions based on USD value
+                const whaleTransfers = data.items
+                  .filter(transfer => {
+                    const usdValue = transfer.total_usd_value ? parseFloat(transfer.total_usd_value) : 0;
+                    return usdValue >= this.thresholds.small; // Only include whale-sized transactions
+                  })
+                  .map(transfer => this.mapSeiTraceToWhaleTransaction(transfer));
+                
+                allTransactions.push(...whaleTransfers);
+                
+                // If we found fewer than 50 transactions, we've reached the end
+                if (data.items.length < 50) {
+                  break;
+                }
+              } else {
+                break; // No more data
+              }
+            } catch (pageError) {
+              console.error(`Error fetching page ${page} for ${contractAddress}:`, pageError);
+              break; // Stop pagination on error
+            }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          console.error(`Error fetching ERC20 transfers for ${contractAddress}:`, error);
+        }
+      }
+
+      // 2. Also check recent transactions from major whale addresses if we have them
+      if (allTransactions.length > 0) {
+        const knownWhaleAddresses = Array.from(new Set(allTransactions.map(tx => tx.from))).slice(0, 3);
+        const additionalTransactions = await this.getWhalesByAddress(knownWhaleAddresses);
+        allTransactions.push(...additionalTransactions);
+      }
+
+      // 3. Add fallback mock data if no real data found
+      if (allTransactions.length === 0) {
+        console.log('No ERC20 whale transfers found, generating sample data');
+        allTransactions.push(...this.generateMockTransactions(Math.min(limit, 20)));
+      }
+
+      // Remove duplicates and sort by USD value and timestamp
+      const uniqueTransactions = Array.from(
+        new Map(allTransactions.map(tx => [tx.hash, tx])).values()
+      );
+
+      const sortedTransactions = uniqueTransactions
+        .sort((a, b) => {
+          // Primary sort: USD value (descending)
+          if (b.amountUSD !== a.amountUSD) {
+            return b.amountUSD - a.amountUSD;
+          }
+          // Secondary sort: timestamp (most recent first)
+          return b.timestamp - a.timestamp;
+        })
+        .slice(0, limit);
+
+      if (sortedTransactions.length > 0) {
+        this.mockDataMode = allTransactions.every(tx => tx.hash.startsWith('0x0'));
+        console.log(`Found ${sortedTransactions.length} whale transactions from ${this.mockDataMode ? 'mock data' : 'SeiTrace API'}`);
+        console.log(`Total transactions scanned: ${uniqueTransactions.length}, Whales found: ${sortedTransactions.length}`);
+        return sortedTransactions;
+      }
+
+      throw new Error('No whale transactions found');
+
     } catch (error) {
-      console.error('Error generating whale insights:', error);
+      console.error('SeiTrace API error, falling back to mock data:', error);
+      this.mockDataMode = true;
+      return this.generateMockTransactions(limit);
+    }
+  }
+
+  async getWhalesByAddress(addresses: string[]): Promise<WhaleTransaction[]> {
+    try {
+      const whaleTransactions: WhaleTransaction[] = [];
+      
+      // Check each address for recent large transactions
+      for (const address of addresses.slice(0, 3)) { // Limit to avoid rate limits
+        try {
+          const url = `https://seitrace.com/insights/api/v2/addresses/token-transfers?chain_id=pacific-1&address=${address}&limit=10`;
+          const data: SeiTraceResponse = await this.makeRequest(url);
+          
+          if (data && data.items) {
+            const transfers = data.items
+              .filter(transfer => {
+                const usdValue = transfer.total_usd_value ? parseFloat(transfer.total_usd_value) : 0;
+                return usdValue >= this.thresholds.small;
+              })
+              .map(transfer => this.mapSeiTraceToWhaleTransaction(transfer));
+            
+            whaleTransactions.push(...transfers);
+          }
+        } catch (addressError) {
+          console.error(`Error fetching transfers for address ${address}:`, addressError);
+        }
+      }
+      
+      return whaleTransactions
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 20);
+      
+    } catch (error) {
+      console.error('Error fetching whale transactions by address:', error);
       return [];
     }
   }
 
-  // Get whale alerts for dashboard
+  async getTokenHolders(contractAddress: string): Promise<WhaleAddress[]> {
+    try {
+      const url = `https://seitrace.com/insights/api/v2/token/erc20/holders?chain_id=pacific-1&contract_address=${contractAddress}&limit=50`;
+      const data = await this.makeRequest(url);
+      
+      if (data && data.items) {
+        return data.items
+          .filter((holder: SeiTraceTokenHolder) => {
+            const usdValue = holder.total_usd_value ? parseFloat(holder.total_usd_value) : 0;
+            return usdValue >= this.thresholds.small;
+          })
+          .map((holder: SeiTraceTokenHolder, index: number) => ({
+            address: holder.wallet_address.address_hash,
+            balance: holder.amount,
+            balanceUSD: parseFloat(holder.total_usd_value || '0'),
+            tokenCount: 1,
+            transactionCount: 0,
+            firstSeenDate: Date.now() - 86400000,
+            lastActiveDate: Date.now(),
+            isContract: false,
+            whaleRank: index + 1,
+            tags: [],
+            riskLevel: this.calculateRiskLevel(parseFloat(holder.total_usd_value || '0')),
+            activityPattern: 'holder',
+            influence: Math.min(100, (parseFloat(holder.total_usd_value || '0') / 1000000) * 100),
+          }));
+      }
+      
+      return [];
+      
+    } catch (error) {
+      console.error('Error fetching token holders:', error);
+      return [];
+    }
+  }
+
+  private calculateRiskLevel(usdValue: number): 'low' | 'medium' | 'high' | 'critical' {
+    if (usdValue >= this.thresholds.mega) return 'critical';
+    if (usdValue >= this.thresholds.large) return 'high';
+    if (usdValue >= this.thresholds.medium) return 'medium';
+    return 'low';
+  }
+
   async getWhaleAlerts(): Promise<WhaleAlerts> {
     try {
       const recentTransactions = await this.getRecentWhaleTransactions(50);
-      const insights = await this.getWhaleInsights();
-
+      
+      const largeTransfers = recentTransactions.filter(tx => tx.amountUSD >= this.thresholds.small);
+      const criticalTransfers = recentTransactions.filter(tx => tx.amountUSD >= this.thresholds.mega);
+      
+      const riskAlerts = await this.generateRiskAlerts(criticalTransfers.slice(0, 5));
+      const unusualActivity = await this.detectUnusualActivity(recentTransactions);
+      
       return {
-        largeTransfers: recentTransactions
-          .filter(tx => tx.impact === 'critical' || tx.impact === 'high')
-          .slice(0, 10),
-        newWhales: await this.detectNewWhales(),
-        unusualActivity: insights
-          .filter(insight => insight.type === 'manipulation' || insight.type === 'liquidity_event')
-          .slice(0, 5),
-        riskAlerts: insights
-          .filter(insight => insight.severity === 'critical' || insight.severity === 'warning')
-          .slice(0, 5),
+        largeTransfers: largeTransfers.slice(0, 20),
+        newWhales: [],
+        unusualActivity: unusualActivity.slice(0, 10),
+        riskAlerts: riskAlerts,
       };
+      
     } catch (error) {
-      console.error('Error fetching whale alerts:', error);
+      console.error('Error getting whale alerts:', error);
       return {
         largeTransfers: [],
         newWhales: [],
@@ -480,504 +471,431 @@ class WhaleTrackerService {
     }
   }
 
-  // Private helper methods
-  private processTransactions(rawTransactions: any[], tokenAddress: string): WhaleTransaction[] {
-    return rawTransactions.map(tx => {
-      const amount = tx.amount || tx.value || '0';
-      const decimals = parseInt(tx.token_info?.token_decimals || '18');
-      const amountFormatted = parseFloat(amount) / Math.pow(10, decimals);
-      const amountUSD = amountFormatted * (tx.token_usd_price || 1);
-      
-      const whaleType = this.getWhaleType(amountUSD);
-      const isWhale = whaleType !== null;
-      
-      return {
-        hash: tx.tx_hash,
-        from: tx.from?.address_hash || tx.from,
-        to: tx.to?.address_hash || tx.to,
-        amount: amountFormatted.toString(),
-        amountUSD,
-        timestamp: new Date(tx.timestamp).getTime(),
-        blockNumber: parseInt(tx.block_height || '0'),
-        tokenAddress,
-        tokenSymbol: tx.token_info?.token_symbol || 'UNKNOWN',
-        tokenName: tx.token_info?.token_name || 'Unknown Token',
-        tokenDecimals: decimals,
-        type: this.determineTransactionType(tx),
-        impact: this.calculateImpact(amountUSD),
-        gasUsed: tx.gas_used || '0',
-        gasPrice: tx.gas_price || '0',
-        isWhale,
-        whaleType: whaleType || 'small',
-        confidenceScore: this.calculateConfidenceScore(tx, amountUSD),
-      };
-    });
-  }
-
-  private analyzeTokenWhales(holders: any[], transfers: any[], tokenInfo: any, tokenAddress: string): TokenWhaleAnalysis {
-    const whaleHolders = holders.filter(holder => {
-      const balance = parseFloat(holder.amount || holder.balance || '0');
-      const decimals = parseInt(tokenInfo.token_decimals || '18');
-      const balanceFormatted = balance / Math.pow(10, decimals);
-      const balanceUSD = balanceFormatted * (tokenInfo.token_usd_price || 1);
-      return balanceUSD >= this.whaleThresholds.small;
-    });
-
-    const totalSupply = parseFloat(tokenInfo.token_total_supply || '1000000');
-    const whaleHoldings = whaleHolders.reduce((sum, holder) => {
-      return sum + parseFloat(holder.percentage || '0');
-    }, 0);
-
-    const recentWhaleTransactions = this.processTransactions(transfers, tokenAddress)
-      .filter(tx => tx.isWhale)
-      .slice(0, 20);
-
-    return {
-      tokenAddress,
-      tokenSymbol: tokenInfo.token_symbol || 'UNKNOWN',
-      tokenName: tokenInfo.token_name || 'Unknown Token',
-      whaleConcentration: whaleHoldings,
-      whaleCount: whaleHolders.length,
-      averageWhaleHolding: whaleHoldings / Math.max(whaleHolders.length, 1),
-      recentWhaleActivity: recentWhaleTransactions,
-      priceImpactRisk: this.assessPriceImpactRisk(whaleHoldings, whaleHolders.length),
-      manipulationRisk: this.calculateManipulationRisk(whaleHoldings, recentWhaleTransactions.length),
-      liquidityHealth: this.assessLiquidityHealth(whaleHoldings, totalSupply),
-    };
-  }
-
-  private processWhaleAddress(addressInfo: any, tokenBalances: any[]): WhaleAddress {
-    const totalUSD = tokenBalances.reduce((sum, balance) => {
-      const amount = parseFloat(balance.amount || '0');
-      const price = balance.token_usd_price || 0;
-      return sum + (amount * price);
-    }, 0);
-
-    const whaleType = this.getWhaleType(totalUSD);
-    const activityPattern = this.determineActivityPattern(addressInfo);
-
-    return {
-      address: addressInfo.hash || addressInfo.address,
-      balance: addressInfo.coin_balance || addressInfo.balance || '0',
-      balanceUSD: totalUSD,
-      tokenCount: tokenBalances.length,
-      transactionCount: addressInfo.txCount || 0,
-      firstSeenDate: addressInfo.firstTxDate || Date.now(),
-      lastActiveDate: addressInfo.lastTxDate || Date.now(),
-      isContract: addressInfo.is_contract || false,
-      whaleRank: this.calculateWhaleRank(totalUSD),
-      tags: this.generateAddressTags(addressInfo, totalUSD),
-      riskLevel: this.assessAddressRisk(addressInfo, totalUSD),
-      activityPattern,
-      influence: this.calculateInfluence(totalUSD, addressInfo.txCount || 0),
-    };
-  }
-
-  // AI Analysis Methods
-  private generateAccumulationInsights(transactions: WhaleTransaction[]): WhaleInsight[] {
-    const insights: WhaleInsight[] = [];
+  private async detectUnusualActivity(transactions: WhaleTransaction[]): Promise<any[]> {
     const addressActivity = new Map<string, WhaleTransaction[]>();
-
-    // Group transactions by address
-    transactions.forEach(tx => {
-      if (!addressActivity.has(tx.to)) {
-        addressActivity.set(tx.to, []);
-      }
-      addressActivity.get(tx.to)!.push(tx);
-    });
-
-    // Detect accumulation patterns
-    addressActivity.forEach((txs, address) => {
-      if (txs.length >= 3) {
-        const totalAccumulated = txs.reduce((sum, tx) => sum + tx.amountUSD, 0);
-        const timeSpan = Math.max(...txs.map(tx => tx.timestamp)) - Math.min(...txs.map(tx => tx.timestamp));
-        const isRecentActivity = timeSpan < 7 * 24 * 60 * 60 * 1000; // 7 days
-
-        if (totalAccumulated > this.whaleThresholds.medium && isRecentActivity) {
-          insights.push({
-            id: `accumulation_${address}_${Date.now()}`,
-            type: 'accumulation',
-            title: '🐋 Whale Accumulation Detected',
-            description: `Large whale has accumulated $${totalAccumulated.toLocaleString()} worth of tokens in recent activity.`,
-            severity: totalAccumulated > this.whaleThresholds.large ? 'critical' : 'warning',
-            confidence: Math.min(95, 60 + (txs.length * 5)),
-            relatedAddresses: [address],
-            relatedTokens: [...new Set(txs.map(tx => tx.tokenAddress))],
-            timestamp: Math.max(...txs.map(tx => tx.timestamp)),
-            aiReasoning: `Detected ${txs.length} large incoming transactions totaling $${totalAccumulated.toLocaleString()} over ${Math.round(timeSpan / (24 * 60 * 60 * 1000))} days. This pattern suggests strategic accumulation by a whale investor.`,
-            tradingSignal: totalAccumulated > this.whaleThresholds.large ? 'buy' : 'hold',
-            expectedImpact: 'Potential upward price pressure as supply decreases',
-          });
-        }
-      }
-    });
-
-    return insights;
-  }
-
-  private generateDistributionInsights(transactions: WhaleTransaction[]): WhaleInsight[] {
-    const insights: WhaleInsight[] = [];
-    const addressActivity = new Map<string, WhaleTransaction[]>();
-
-    // Group transactions by from address
+    
     transactions.forEach(tx => {
       if (!addressActivity.has(tx.from)) {
         addressActivity.set(tx.from, []);
       }
       addressActivity.get(tx.from)!.push(tx);
     });
-
-    // Detect distribution patterns
+    
+    const unusual: any[] = [];
+    
     addressActivity.forEach((txs, address) => {
-      if (txs.length >= 2) {
-        const totalDistributed = txs.reduce((sum, tx) => sum + tx.amountUSD, 0);
-        const uniqueReceivers = new Set(txs.map(tx => tx.to)).size;
-        const timeSpan = Math.max(...txs.map(tx => tx.timestamp)) - Math.min(...txs.map(tx => tx.timestamp));
-
-        if (totalDistributed > this.whaleThresholds.medium && uniqueReceivers > 1) {
-          insights.push({
-            id: `distribution_${address}_${Date.now()}`,
-            type: 'distribution',
-            title: '⚠️ Whale Distribution Alert',
-            description: `Whale distributed $${totalDistributed.toLocaleString()} across ${uniqueReceivers} addresses.`,
-            severity: totalDistributed > this.whaleThresholds.large ? 'critical' : 'warning',
-            confidence: Math.min(90, 50 + (uniqueReceivers * 10)),
-            relatedAddresses: [address, ...txs.map(tx => tx.to)],
-            relatedTokens: [...new Set(txs.map(tx => tx.tokenAddress))],
-            timestamp: Math.max(...txs.map(tx => tx.timestamp)),
-            aiReasoning: `Whale distributed tokens to ${uniqueReceivers} different addresses within a short timeframe, potentially indicating profit-taking or exit strategy.`,
-            tradingSignal: 'caution',
-            expectedImpact: 'Potential downward price pressure from increased selling',
-          });
-        }
+      if (txs.length >= 3) { // 3+ large transactions from same address
+        const totalVolume = txs.reduce((sum, tx) => sum + tx.amountUSD, 0);
+        unusual.push({
+          type: 'high_frequency',
+          address,
+          transactionCount: txs.length,
+          totalVolume,
+          description: `${txs.length} large transactions totaling $${totalVolume.toLocaleString()}`,
+          severity: totalVolume > this.thresholds.mega ? 'critical' : 'warning',
+          timestamp: Math.max(...txs.map(tx => tx.timestamp)),
+        });
       }
     });
-
-    return insights;
-  }
-
-  private generateSmartMoneyInsights(transactions: WhaleTransaction[]): WhaleInsight[] {
-    const insights: WhaleInsight[] = [];
     
-    // Detect smart money patterns (early large purchases, strategic timing)
-    const smartMoneyIndicators = transactions.filter(tx => 
-      tx.amountUSD > this.whaleThresholds.large && 
-      tx.confidenceScore > 80
-    );
-
-    if (smartMoneyIndicators.length > 0) {
-      insights.push({
-        id: `smart_money_${Date.now()}`,
-        type: 'smart_money',
-        title: '🧠 Smart Money Activity',
-        description: `Detected ${smartMoneyIndicators.length} high-confidence whale transactions indicating smart money movement.`,
-        severity: 'info',
-        confidence: 85,
-        relatedAddresses: [...new Set(smartMoneyIndicators.flatMap(tx => [tx.from, tx.to]))],
-        relatedTokens: [...new Set(smartMoneyIndicators.map(tx => tx.tokenAddress))],
-        timestamp: Math.max(...smartMoneyIndicators.map(tx => tx.timestamp)),
-        aiReasoning: 'Large transactions with high confidence scores suggest institutional or experienced traders making strategic moves.',
-        tradingSignal: 'hold',
-        expectedImpact: 'Follow smart money for potential alpha opportunities',
-      });
-    }
-
-    return insights;
+    return unusual;
   }
 
-  private generateRiskInsights(transactions: WhaleTransaction[]): WhaleInsight[] {
-    const insights: WhaleInsight[] = [];
-    
-    // Detect manipulation risks
-    const suspiciousPatterns = transactions.filter(tx => 
-      tx.impact === 'critical' && 
-      tx.type === 'transfer'
-    );
-
-    if (suspiciousPatterns.length > 3) {
-      insights.push({
-        id: `manipulation_risk_${Date.now()}`,
-        type: 'manipulation',
-        title: '🚨 Manipulation Risk Alert',
-        description: `Multiple critical impact transfers detected - potential market manipulation.`,
-        severity: 'critical',
-        confidence: 75,
-        relatedAddresses: [...new Set(suspiciousPatterns.flatMap(tx => [tx.from, tx.to]))],
-        relatedTokens: [...new Set(suspiciousPatterns.map(tx => tx.tokenAddress))],
-        timestamp: Date.now(),
-        aiReasoning: 'Pattern of large transfers without clear trading logic may indicate coordinated manipulation attempt.',
-        tradingSignal: 'caution',
-        expectedImpact: 'High volatility risk - exercise extreme caution',
-      });
-    }
-
-    return insights;
-  }
-
-  private async detectNewWhales(): Promise<WhaleAddress[]> {
-    // Mock implementation - in real app, this would track new large holders
-    const newWhales: WhaleAddress[] = [];
+  private async generateRiskAlerts(criticalTransactions: WhaleTransaction[]): Promise<RiskAlert[]> {
+    if (criticalTransactions.length === 0) return [];
     
     try {
-      // Get recent large transactions and check if addresses are new whales
-      const recentTxs = await this.getRecentWhaleTransactions(20);
-      const uniqueAddresses = [...new Set(recentTxs.map(tx => tx.to))];
+      const prompt = `Analyze these large cryptocurrency transactions on Sei network and identify potential risks:
+
+${criticalTransactions.slice(0, 5).map(tx => 
+  `- $${tx.amountUSD.toLocaleString()} ${tx.tokenSymbol} transfer from ${tx.from} to ${tx.to} (Hash: ${tx.hash})`
+).join('\n')}
+
+Focus on:
+1. Market manipulation risks
+2. Liquidity impact
+3. Whale accumulation/distribution patterns
+4. Potential security risks
+
+Provide 2-3 specific risk alerts with titles, descriptions, and severity levels (critical/warning/info).
+Format as JSON array with fields: title, description, severity, confidence (0-100).`;
+
+      const model = this.gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
       
-      for (const address of uniqueAddresses.slice(0, 3)) {
-        const whaleDetails = await this.getWhaleAddressDetails(address);
-        if (whaleDetails.balanceUSD > this.whaleThresholds.medium) {
-          newWhales.push(whaleDetails);
+      try {
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const alerts = JSON.parse(jsonMatch[0]);
+          return alerts.map((alert: any, index: number) => ({
+            id: `risk_${Date.now()}_${index}`,
+            title: alert.title || 'Risk Alert',
+            description: alert.description || 'Unusual whale activity detected',
+            severity: alert.severity || 'warning',
+            confidence: alert.confidence || 75,
+            timestamp: Date.now(),
+            relatedTransactions: criticalTransactions.slice(0, 3).map(tx => tx.hash),
+          }));
         }
+      } catch (parseError) {
+        console.error('Error parsing AI response:', parseError);
       }
+      
+      return [{
+        id: `risk_${Date.now()}`,
+        title: 'Large Whale Activity Detected',
+        description: `${criticalTransactions.length} critical transactions worth over $${this.thresholds.mega.toLocaleString()} detected`,
+        severity: 'warning' as const,
+        confidence: 80,
+        timestamp: Date.now(),
+        relatedTransactions: criticalTransactions.map(tx => tx.hash),
+      }];
+      
     } catch (error) {
-      console.error('Error detecting new whales:', error);
+      console.error('Error generating risk alerts:', error);
+      return [];
     }
-
-    return newWhales;
   }
 
-  // Threshold management methods
-  public getWhaleThresholds() {
-    return { ...this.whaleThresholds };
-  }
+  async getWhaleInsights(): Promise<WhaleInsight[]> {
+    try {
+      const recentTransactions = await this.getRecentWhaleTransactions(30);
+      
+      if (recentTransactions.length === 0) {
+        return [];
+      }
+      
+      const prompt = `Analyze these whale transactions on Sei network and provide market insights:
 
-  public setWhaleThresholds(thresholds: Partial<typeof this.whaleThresholds>): void {
-    this.whaleThresholds = { ...this.whaleThresholds, ...thresholds };
-    this.clearCache(); // Clear cache when thresholds change
-  }
+Recent Large Transactions:
+${recentTransactions.slice(0, 10).map(tx => 
+  `- $${tx.amountUSD.toLocaleString()} ${tx.tokenSymbol} ${tx.type} (${tx.impact} impact)`
+).join('\n')}
 
-  public getMinWhaleTransaction(): number {
-    return this.MIN_WHALE_TRANSACTION_USD;
-  }
+Statistics:
+- Total transactions: ${recentTransactions.length}
+- Average transaction: $${(recentTransactions.reduce((sum, tx) => sum + tx.amountUSD, 0) / recentTransactions.length).toLocaleString()}
+- Largest transaction: $${Math.max(...recentTransactions.map(tx => tx.amountUSD)).toLocaleString()}
 
-  // Helper to determine whale tier based on transaction amount
-  private getWhaleTier(amountUSD: number): 'mega' | 'large' | 'medium' | 'small' | null {
-    if (amountUSD >= this.whaleThresholds.mega) return 'mega';
-    if (amountUSD >= this.whaleThresholds.large) return 'large';
-    if (amountUSD >= this.whaleThresholds.medium) return 'medium';
-    if (amountUSD >= this.whaleThresholds.small) return 'small';
-    return null;
-  }
+Provide 2-3 market insights with:
+1. Pattern analysis (accumulation, distribution, smart money, etc.)
+2. Trading signals (bullish, bearish, neutral, caution)  
+3. Expected market impact
+4. Confidence level (0-100)
 
-  // Helper to determine impact level based on transaction amount
-  private getImpactLevel(amountUSD: number): 'critical' | 'high' | 'medium' | 'low' {
-    if (amountUSD >= this.whaleThresholds.mega) return 'critical';
-    if (amountUSD >= this.whaleThresholds.large) return 'high';
-    if (amountUSD >= this.whaleThresholds.medium) return 'medium';
-    return 'low';
-  }
+Format as JSON array with fields: type, title, description, severity, confidence, tradingSignal, aiReasoning, expectedImpact.`;
 
-  // Utility methods
-  private getWhaleType(amountUSD: number): 'mega' | 'large' | 'medium' | 'small' | null {
-    if (amountUSD >= this.whaleThresholds.mega) return 'mega';
-    if (amountUSD >= this.whaleThresholds.large) return 'large';
-    if (amountUSD >= this.whaleThresholds.medium) return 'medium';
-    if (amountUSD >= this.whaleThresholds.small) return 'small';
-    return null;
-  }
-
-  private determineTransactionType(tx: any): 'buy' | 'sell' | 'transfer' {
-    // Simple heuristic - in reality, this would be more sophisticated
-    if (tx.from === '0x0000000000000000000000000000000000000000') return 'buy';
-    if (tx.to === '0x0000000000000000000000000000000000000000') return 'sell';
-    return 'transfer';
-  }
-
-  private calculateImpact(amountUSD: number): 'critical' | 'high' | 'medium' | 'low' {
-    if (amountUSD >= this.whaleThresholds.mega) return 'critical';
-    if (amountUSD >= this.whaleThresholds.large) return 'high';
-    if (amountUSD >= this.whaleThresholds.medium) return 'medium';
-    return 'low';
-  }
-
-  private calculateConfidenceScore(amountUSD: number, tx: any): number {
-    let score = 70; // Base confidence
-    
-    // Higher amounts get higher confidence
-    if (amountUSD >= this.whaleThresholds.mega) score += 25;
-    else if (amountUSD >= this.whaleThresholds.large) score += 20;
-    else if (amountUSD >= this.whaleThresholds.medium) score += 15;
-    else score += 10;
-    
-    // Add some randomness
-    score += Math.random() * 10 - 5;
-    
-    return Math.min(100, Math.max(60, score));
-  }
-
-  // Helper methods for transaction processing
-  private parseTransactionValue(tx: any): number {
-    if (tx.value_usd) return parseFloat(tx.value_usd);
-    if (tx.amount && tx.token_price_usd) {
-      return parseFloat(tx.amount) * parseFloat(tx.token_price_usd);
+      const model = this.gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      try {
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const insights = JSON.parse(jsonMatch[0]);
+          return insights.map((insight: any, index: number) => ({
+            id: `insight_${Date.now()}_${index}`,
+            type: insight.type || 'smart_money',
+            title: insight.title || 'Whale Activity Analysis',
+            description: insight.description || 'Significant whale activity detected',
+            severity: insight.severity || 'info',
+            confidence: Math.min(100, Math.max(0, insight.confidence || 70)),
+            tradingSignal: insight.tradingSignal || 'neutral',
+            aiReasoning: insight.aiReasoning || insight.description || 'AI analysis of whale patterns',
+            expectedImpact: insight.expectedImpact || 'Market impact assessment pending',
+            timestamp: Date.now(),
+            relatedAddresses: recentTransactions.slice(0, 5).map(tx => tx.from),
+          }));
+        }
+      } catch (parseError) {
+        console.error('Error parsing AI insights:', parseError);
+      }
+      
+      const avgAmount = recentTransactions.reduce((sum, tx) => sum + tx.amountUSD, 0) / recentTransactions.length;
+      const criticalCount = recentTransactions.filter(tx => tx.impact === 'critical').length;
+      
+      return [{
+        id: `insight_${Date.now()}`,
+        type: 'smart_money' as const,
+        title: 'Whale Activity Summary',
+        description: `${recentTransactions.length} whale transactions detected with average value of $${avgAmount.toLocaleString()}`,
+        severity: criticalCount > 3 ? 'critical' : 'info' as const,
+        confidence: 75,
+        tradingSignal: criticalCount > 5 ? 'caution' : 'neutral' as const,
+        aiReasoning: 'Analysis based on transaction volume and frequency patterns',
+        expectedImpact: criticalCount > 3 ? 'High potential for market volatility' : 'Moderate market activity',
+        timestamp: Date.now(),
+        relatedAddresses: recentTransactions.slice(0, 5).map(tx => tx.from),
+      }];
+      
+    } catch (error) {
+      console.error('Error generating whale insights:', error);
+      return [];
     }
-    // Fallback: generate realistic whale-sized transaction
-    return this.whaleThresholds.small + Math.random() * this.whaleThresholds.large;
   }
 
-  private generateTxHash(): string {
-    return '0x' + Array.from({ length: 64 }, () => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-  }
-
-  private generateAddress(): string {
-    return '0x' + Array.from({ length: 40 }, () => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-  }
-
-  private getRandomWhaleTier(): 'mega' | 'large' | 'medium' | 'small' {
-    const rand = Math.random();
-    if (rand < 0.05) return 'mega';    // 5% mega whales
-    if (rand < 0.20) return 'large';   // 15% large whales
-    if (rand < 0.50) return 'medium';  // 30% medium whales
-    return 'small';                    // 50% small whales
-  }
-
-  // Public utility methods
-  public isUsingMockData(): boolean {
-    return this.useMockData;
-  }
-
-  public getRateLimitStatus(): { requestsUsed: number; requestsRemaining: number; resetTime: number } {
-    const now = Date.now();
-    if (now >= this.rateLimitReset) {
-      return {
-        requestsUsed: 0,
-        requestsRemaining: this.MAX_REQUESTS_PER_MINUTE,
-        resetTime: now + 60000
+  async getTokenWhaleAnalysis(tokenAddress: string): Promise<TokenWhaleAnalysis | null> {
+    try {
+      const holders = await this.getTokenHolders(tokenAddress);
+      const recentActivity = await this.getRecentWhaleTransactions(20);
+      
+      const tokenActivity = recentActivity.filter(tx => 
+        tx.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+      );
+      
+      if (holders.length === 0 && tokenActivity.length === 0) {
+        return null;
+      }
+      
+      const totalHoldings = holders.reduce((sum, holder) => sum + holder.balanceUSD, 0);
+      const top10Holdings = holders.slice(0, 10).reduce((sum, holder) => sum + holder.balanceUSD, 0);
+      const whaleConcentration = totalHoldings > 0 ? (top10Holdings / totalHoldings) * 100 : 0;
+      
+      const tokenInfo = tokenActivity[0] || {
+        tokenSymbol: 'UNKNOWN',
+        tokenName: 'Unknown Token',
       };
+      
+      return {
+        tokenAddress,
+        tokenSymbol: tokenInfo.tokenSymbol,
+        tokenName: tokenInfo.tokenName,
+        whaleConcentration,
+        whaleCount: holders.length,
+        averageWhaleHolding: totalHoldings / Math.max(1, holders.length),
+        recentWhaleActivity: tokenActivity.slice(0, 10),
+        priceImpactRisk: this.calculatePriceImpactRisk(whaleConcentration, tokenActivity),
+        manipulationRisk: this.calculateManipulationRisk(tokenActivity),
+        liquidityHealth: this.calculateLiquidityHealth(totalHoldings, tokenActivity.length),
+        topWhales: holders.slice(0, 10),
+      };
+      
+    } catch (error) {
+      console.error('Error getting token whale analysis:', error);
+      return null;
     }
-    
-    return {
-      requestsUsed: this.requestCount,
-      requestsRemaining: this.MAX_REQUESTS_PER_MINUTE - this.requestCount,
-      resetTime: this.rateLimitReset
-    };
   }
 
-  public clearCache(): void {
-    this.cache.clear();
-    console.log('Cache cleared');
-  }
-
-  public getApiKeyStatus(): string {
-    if (this.useMockData) {
-      return this.apiKey ? 'API Error - Using Mock Data' : 'No API Key - Using Mock Data';
-    }
-    return 'API Connected';
-  }
-
-  // Risk assessment methods based on transaction patterns
-  private assessPriceImpactFromTransactions(whaleTransactions: WhaleTransaction[]): 'low' | 'medium' | 'high' | 'critical' {
-    const megaTxCount = whaleTransactions.filter(tx => tx.amountUSD >= this.whaleThresholds.mega).length;
-    const largeTxCount = whaleTransactions.filter(tx => tx.amountUSD >= this.whaleThresholds.large).length;
-    
-    if (megaTxCount >= 3) return 'critical';
-    if (megaTxCount >= 1 || largeTxCount >= 5) return 'high';
-    if (largeTxCount >= 2) return 'medium';
+  private calculatePriceImpactRisk(whaleConcentration: number, transactions: WhaleTransaction[]): 'low' | 'medium' | 'high' | 'critical' {
+    if (whaleConcentration > 70 && transactions.length > 5) return 'critical';
+    if (whaleConcentration > 50 || transactions.filter(tx => tx.impact === 'critical').length > 2) return 'high';
+    if (whaleConcentration > 30 || transactions.length > 3) return 'medium';
     return 'low';
   }
 
-  private calculateManipulationFromTransactions(whaleTransactions: WhaleTransaction[]): number {
-    // Check for suspicious patterns: rapid large transactions from same addresses
-    const addressFrequency = new Map<string, number>();
-    whaleTransactions.forEach(tx => {
-      addressFrequency.set(tx.from, (addressFrequency.get(tx.from) || 0) + 1);
-    });
-
-    const maxFrequency = Math.max(0, ...Array.from(addressFrequency.values()));
-    const rapidTransactions = whaleTransactions.filter(tx => 
-      Date.now() - tx.timestamp < 60 * 60 * 1000 // Last hour
-    ).length;
-
-    let riskScore = 0;
-    if (maxFrequency >= 5) riskScore += 30; // Same address multiple large transactions
-    if (rapidTransactions >= 3) riskScore += 25; // Multiple large transactions in short time
-    if (whaleTransactions.length >= 10) riskScore += 20; // High activity volume
-
-    return Math.min(100, riskScore);
-  }
-
-  private assessLiquidityFromActivity(allTx: WhaleTransaction[], whaleTx: WhaleTransaction[]): 'poor' | 'fair' | 'good' | 'excellent' {
-    if (allTx.length === 0) return 'poor';
-    
-    const whaleRatio = whaleTx.length / allTx.length;
-    const recentActivity = allTx.filter(tx => Date.now() - tx.timestamp < 24 * 60 * 60 * 1000).length;
-    
-    if (whaleRatio < 0.1 && recentActivity >= 50) return 'excellent';
-    if (whaleRatio < 0.2 && recentActivity >= 20) return 'good';
-    if (whaleRatio < 0.4 && recentActivity >= 10) return 'fair';
-    return 'poor';
-  }
-
-  // Legacy methods for backward compatibility (simplified implementations)
-  private assessPriceImpactRisk(whaleHoldings: number, whaleCount: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (whaleHoldings > 75 && whaleCount < 5) return 'critical';
-    if (whaleHoldings > 50 && whaleCount < 10) return 'high';
-    if (whaleHoldings > 30) return 'medium';
-    return 'low';
-  }
-
-  private calculateManipulationRisk(whaleHoldings: number, recentTxCount: number): number {
+  private calculateManipulationRisk(transactions: WhaleTransaction[]): number {
     let risk = 0;
-    if (whaleHoldings > 70) risk += 40;
-    if (whaleHoldings > 50) risk += 20;
-    if (recentTxCount > 20) risk += 15;
+    
+    risk += Math.min(50, transactions.length * 5);
+    
+    const timeSpan = transactions.length > 1 ? 
+      Math.max(...transactions.map(tx => tx.timestamp)) - Math.min(...transactions.map(tx => tx.timestamp)) : 
+      86400000;
+    
+    if (timeSpan < 3600000 && transactions.length > 3) risk += 30;
+    
+    const uniqueAddresses = new Set(transactions.map(tx => tx.from)).size;
+    if (uniqueAddresses < 3 && transactions.length > 5) risk += 25;
+    
     return Math.min(100, risk);
   }
 
-  private assessLiquidityHealth(whaleHoldings: number, totalSupply: number): 'poor' | 'fair' | 'good' | 'excellent' {
-    if (whaleHoldings < 20 && totalSupply > 1000000) return 'excellent';
-    if (whaleHoldings < 40 && totalSupply > 500000) return 'good';
-    if (whaleHoldings < 60) return 'fair';
+  private calculateLiquidityHealth(totalUSD: number, transactionCount: number): 'poor' | 'fair' | 'good' | 'excellent' {
+    const liquidityScore = Math.log10(totalUSD + 1) * 10 + transactionCount;
+    
+    if (liquidityScore > 100) return 'excellent';
+    if (liquidityScore > 60) return 'good';
+    if (liquidityScore > 30) return 'fair';
     return 'poor';
   }
 
-  private determineActivityPattern(addressInfo: any): 'accumulator' | 'distributor' | 'trader' | 'holder' {
-    const patterns = ['accumulator', 'distributor', 'trader', 'holder'] as const;
-    return patterns[Math.floor(Math.random() * patterns.length)];
+  private generateMockTransactions(limit: number): WhaleTransaction[] {
+    const transactions: WhaleTransaction[] = [];
+    const tokens = [
+      { symbol: 'SEI', name: 'Sei', address: 'usei', decimals: 6 },
+      { symbol: 'WSEI', name: 'Wrapped SEI', address: '0x3894085Ef7Ff0f0aeDf52E2A2704928d259C2fc7', decimals: 18 },
+      { symbol: 'USDC', name: 'USD Coin', address: '0x1234567890123456789012345678901234567890', decimals: 6 },
+    ];
+    
+    for (let i = 0; i < limit; i++) {
+      const token = tokens[Math.floor(Math.random() * tokens.length)];
+      const amountUSD = Math.random() * 2000000 + this.thresholds.small;
+      const amount = (amountUSD / (Math.random() * 100 + 1)).toFixed(token.decimals);
+      
+      transactions.push({
+        hash: `0x0${Math.random().toString(16).substr(2, 63)}`,
+        from: `0x${Math.random().toString(16).substr(2, 40)}`,
+        to: `0x${Math.random().toString(16).substr(2, 40)}`,
+        amount,
+        amountUSD,
+        timestamp: Date.now() - Math.random() * 86400000,
+        blockNumber: Math.floor(Math.random() * 1000000 + 10000000),
+        tokenAddress: token.address,
+        tokenSymbol: token.symbol,
+        tokenName: token.name,
+        tokenDecimals: token.decimals,
+        type: 'transfer',
+        impact: this.calculateImpact(amountUSD),
+        gasUsed: Math.floor(Math.random() * 100000 + 21000).toString(),
+        gasPrice: (Math.random() * 50 + 10).toString(),
+        isWhale: true,
+        whaleType: this.getWhaleType(amountUSD),
+        confidenceScore: Math.floor(Math.random() * 40 + 60),
+      });
+    }
+    
+    return transactions.sort((a, b) => b.timestamp - a.timestamp);
   }
 
-  private calculateWhaleRank(totalUSD: number): number {
-    if (totalUSD >= this.whaleThresholds.mega) return Math.floor(Math.random() * 10) + 1;
-    if (totalUSD >= this.whaleThresholds.large) return Math.floor(Math.random() * 50) + 11;
-    if (totalUSD >= this.whaleThresholds.medium) return Math.floor(Math.random() * 200) + 61;
-    return Math.floor(Math.random() * 1000) + 261;
+  /**
+   * Scans recent transactions across the network to find whale activity
+   * @param scanLimit - Number of recent transactions to scan (up to 1000)
+   * @param whaleLimit - Number of whale transactions to return
+   */
+  async scanForWhaleTransactions(scanLimit: number = 1000, whaleLimit: number = 50): Promise<{
+    totalScanned: number;
+    whalesFound: number;
+    transactions: WhaleTransaction[];
+  }> {
+    try {
+      console.log(`Scanning up to ${scanLimit} recent transactions for whale activity...`);
+      const allScannedTransactions: SeiTraceTokenTransfer[] = [];
+      const whaleTransactions: WhaleTransaction[] = [];
+      
+      // Calculate how many pages we need (50 per page max)
+      const maxTransactionsPerPage = 50;
+      const totalPages = Math.min(Math.ceil(scanLimit / maxTransactionsPerPage), 20); // Cap at 20 pages (1000 transactions)
+      
+      // Scan transactions from multiple major contracts
+      for (const contractAddress of this.MAJOR_TOKEN_CONTRACTS.erc20) {
+        try {
+          console.log(`Scanning contract ${contractAddress}...`);
+          
+          for (let page = 0; page < totalPages; page++) {
+            const offset = page * maxTransactionsPerPage;
+            const pageLimit = Math.min(maxTransactionsPerPage, scanLimit - allScannedTransactions.length);
+            
+            if (pageLimit <= 0) break;
+            
+            const url = `https://seitrace.com/insights/api/v2/token/erc20/transfers?chain_id=pacific-1&contract_address=${contractAddress}&limit=${pageLimit}&offset=${offset}`;
+            
+            try {
+              const data: SeiTraceResponse = await this.makeRequest(url);
+              
+              if (data && data.items && data.items.length > 0) {
+                allScannedTransactions.push(...data.items);
+                
+                // Check each transaction against whale thresholds
+                for (const transfer of data.items) {
+                  const usdValue = transfer.total_usd_value ? parseFloat(transfer.total_usd_value) : 0;
+                  
+                  if (usdValue >= this.thresholds.small) {
+                    const whaleTransaction = this.mapSeiTraceToWhaleTransaction(transfer);
+                    whaleTransactions.push(whaleTransaction);
+                    
+                    console.log(`🐋 Whale found: $${usdValue.toLocaleString()} ${transfer.token_info.token_symbol}`);
+                  }
+                }
+                
+                // If we found fewer than requested, we've reached the end
+                if (data.items.length < pageLimit) {
+                  break;
+                }
+              } else {
+                break; // No more data
+              }
+            } catch (pageError) {
+              console.error(`Error scanning page ${page} for ${contractAddress}:`, pageError);
+              break;
+            }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            // Stop if we've scanned enough transactions
+            if (allScannedTransactions.length >= scanLimit) {
+              break;
+            }
+          }
+        } catch (contractError) {
+          console.error(`Error scanning contract ${contractAddress}:`, contractError);
+          continue; // Try next contract
+        }
+        
+        // Stop if we've found enough whales
+        if (whaleTransactions.length >= whaleLimit) {
+          break;
+        }
+      }
+      
+      // Remove duplicates and sort by USD value
+      const uniqueWhales = Array.from(
+        new Map(whaleTransactions.map(tx => [tx.hash, tx])).values()
+      );
+      
+      const sortedWhales = uniqueWhales
+        .sort((a, b) => {
+          if (b.amountUSD !== a.amountUSD) {
+            return b.amountUSD - a.amountUSD;
+          }
+          return b.timestamp - a.timestamp;
+        })
+        .slice(0, whaleLimit);
+      
+      const result = {
+        totalScanned: allScannedTransactions.length,
+        whalesFound: sortedWhales.length,
+        transactions: sortedWhales
+      };
+      
+      console.log(`Scan complete: ${result.totalScanned} transactions scanned, ${result.whalesFound} whales found`);
+      
+      return result;
+      
+    } catch (error) {
+      console.error('Error scanning for whale transactions:', error);
+      return {
+        totalScanned: 0,
+        whalesFound: 0,
+        transactions: []
+      };
+    }
   }
 
-  private generateAddressTags(addressInfo: any, balanceUSD: number): string[] {
-    const tags: string[] = [];
-    if (balanceUSD >= this.whaleThresholds.mega) tags.push('Mega Whale');
-    else if (balanceUSD >= this.whaleThresholds.large) tags.push('Large Whale');
-    else if (balanceUSD >= this.whaleThresholds.medium) tags.push('Medium Whale');
-    else tags.push('Small Whale');
-    
-    if (Math.random() > 0.7) tags.push('High Activity');
-    if (Math.random() > 0.8) tags.push('Smart Money');
-    
-    return tags;
+  getWhaleThresholds() {
+    return { ...this.thresholds };
   }
 
-  private assessAddressRisk(addressInfo: any, totalUSD: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (totalUSD >= this.whaleThresholds.mega) return 'high';
-    if (totalUSD >= this.whaleThresholds.large) return 'medium';
-    return 'low';
+  setWhaleThresholds(newThresholds: Partial<typeof this.thresholds>) {
+    this.thresholds = { ...this.thresholds, ...newThresholds };
   }
 
-  private calculateInfluence(totalUSD: number, txCount: number): number {
-    let influence = 0;
-    if (totalUSD >= this.whaleThresholds.mega) influence += 40;
-    else if (totalUSD >= this.whaleThresholds.large) influence += 30;
-    else if (totalUSD >= this.whaleThresholds.medium) influence += 20;
-    else influence += 10;
-    
-    if (txCount > 1000) influence += 20;
-    else if (txCount > 100) influence += 10;
-    
-    return Math.min(100, influence + Math.random() * 10);
+  getMinWhaleTransaction(): number {
+    return this.thresholds.small;
+  }
+
+  isUsingMockData(): boolean {
+    return this.mockDataMode;
+  }
+
+  getApiKeyStatus(): string {
+    const apiKey = typeof window !== 'undefined' 
+      ? (window as any).ENV?.VITE_SEITRACE_API_KEY || import.meta.env.VITE_SEITRACE_API_KEY
+      : process.env.NEXT_PUBLIC_SEITRACE_API_KEY || process.env.VITE_SEITRACE_API_KEY;
+
+    if (!apiKey) return 'API Key Missing';
+    if (this.mockDataMode) return 'Using Mock Data';
+    return 'Connected to SeiTrace';
+  }
+
+  getRateLimitStatus() {
+    return { ...this.rateLimitInfo };
   }
 }
 
+// Export singleton instance
 export const whaleTrackerService = new WhaleTrackerService();
+export default whaleTrackerService;
