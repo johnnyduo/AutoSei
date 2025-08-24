@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import Lottie from 'lottie-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,15 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [birdAnimation, setBirdAnimation] = useState<any>(null);
+
+  // Load the Lottie animation data
+  React.useEffect(() => {
+    fetch('/Cute Bird Flapping Animation.json')
+      .then(response => response.json())
+      .then(data => setBirdAnimation(data))
+      .catch(error => console.warn('Could not load bird animation:', error));
+  }, []);
 
   const handleLaunchApp = async () => {
     setIsLoading(true);
@@ -162,6 +172,31 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp }) => {
                 <Sparkles className="w-4 h-4 mr-2" />
                 Powered by AI on Sei EVM Network
               </Badge>
+              
+              {/* Lottie Animation */}
+              <div className="flex justify-center mb-8">
+                <div className="w-96 h-48 md:w-120 md:h-60 overflow-hidden rounded-lg">
+                  {birdAnimation ? (
+                    <Lottie
+                      animationData={birdAnimation}
+                      loop={true}
+                      autoplay={true}
+                      style={{ 
+                        width: '100%', 
+                        height: '200%',
+                        transform: 'translateY(-25%)',
+                        objectFit: 'cover'
+                      }}
+                      className="drop-shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
               <h1 className="text-5xl md:text-7xl font-bold mb-6 cosmic-text">
                 AI-Powered DeFi
                 <br />
