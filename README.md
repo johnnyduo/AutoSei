@@ -22,10 +22,11 @@
 
 ![Cute Bird Flapping Animation](https://github.com/user-attachments/assets/cd0f0dba-1b12-4437-8053-a380836cfe84)
 
-
 AutoSei is a cutting-edge DeFi portfolio management platform built specifically for the Sei EVM network. It combines advanced artificial intelligence, intelligent trading bots, real-time whale tracking, and intuitive user experience to democratize sophisticated portfolio management strategies for DeFi investors.
 
 **AutoSei transforms complex DeFi operations into simple conversations**, enabling users to manage portfolios, deploy trading bots, track whale activities, and optimize yields through natural language interactions with AI.
+
+<img width="1588" height="857" alt="Screenshot 2568-08-24 at 23 46 45" src="https://github.com/user-attachments/assets/2911ee49-0869-46fa-9527-3b68bdaf9ddd" />
 
 ---
 
@@ -235,6 +236,8 @@ Non-crypto users loved the conversational interface but required more guided tem
 
 ---
 
+<img width="3456" height="5188" alt="image" src="https://github.com/user-attachments/assets/3593e44f-0356-4736-8e6f-981630d1686e" />
+
 ## ✨ Features
 
 ### 🤖 AI-Powered Portfolio Navigator
@@ -244,6 +247,8 @@ Non-crypto users loved the conversational interface but required more guided tem
 - **Market Insights**: Real-time analysis of market trends and investment opportunities
 - **Strategy Recommendations**: Personalized investment advice based on market conditions
 
+<img width="3456" height="2602" alt="image" src="https://github.com/user-attachments/assets/ec0a8021-0f8b-40ea-b33a-c96e919dbfd6" />
+
 ### 🐋 Advanced Whale Activity Tracker
 - **Real-time Monitoring**: Live tracking of large transactions (≥$10K configurable thresholds)
 - **Deep Scanner**: Scan up to 1,000 recent transactions to discover hidden whale activity
@@ -251,6 +256,8 @@ Non-crypto users loved the conversational interface but required more guided tem
 - **Configurable Thresholds**: Customize whale detection from $10K to $1M+ transactions
 - **Risk Alerts**: Automated alerts for potential market manipulation and unusual activities
 - **Historical Patterns**: Comprehensive whale behavior analysis and trends
+
+<img width="1687" height="879" alt="Screenshot 2568-08-24 at 23 49 01" src="https://github.com/user-attachments/assets/b9cba030-5272-4493-8a12-024632bf43d0" />
 
 ### 🤖 Intelligent Trading Bots Dashboard
 - **Multiple Bot Strategies**: Momentum, Mean Reversion, Arbitrage, Yield Farming, Grid Trading, DCA
@@ -260,6 +267,8 @@ Non-crypto users loved the conversational interface but required more guided tem
 - **Backtesting Engine**: Historical strategy performance validation
 - **Portfolio Integration**: Bots work seamlessly with portfolio allocation system
 
+<img width="3456" height="1834" alt="image" src="https://github.com/user-attachments/assets/5198c887-84dd-42b4-accb-fa27184dcee1" />
+
 ### 📊 Automated Portfolio Management
 - **7 Asset Categories**: AI, Meme, RWA, BigCap, DeFi, L1, Stablecoin with dynamic allocation
 - **Smart Contract Automation**: On-chain portfolio rebalancing and execution
@@ -267,12 +276,16 @@ Non-crypto users loved the conversational interface but required more guided tem
 - **Yield Optimization**: Automatic discovery and comparison of DeFi protocol yields
 - **Risk Controls**: Built-in circuit breakers and emergency stop mechanisms
 
+<img width="3456" height="2684" alt="image" src="https://github.com/user-attachments/assets/2cf60e20-0270-4002-b112-3dfa2b1d3eec" />
+
 ### 🎯 Professional Trading Strategies Hub
 - **Strategy Marketplace**: Curated collection of proven DeFi trading strategies
 - **Custom Strategy Builder**: Create and backtest your own trading algorithms
 - **Social Trading**: Follow and copy successful traders' strategies
 - **Risk-Adjusted Returns**: Comprehensive performance metrics and analytics
 - **Multi-Asset Support**: Trade across 50+ tokens on Sei EVM ecosystem
+
+<img width="3456" height="1928" alt="image" src="https://github.com/user-attachments/assets/59b4df8e-138a-4f61-bbd7-fd8d47bf6f7c" />
 
 ### 🔍 Market Intelligence
 - **50+ Supported Tokens**: Comprehensive token coverage on Sei EVM
