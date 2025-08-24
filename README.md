@@ -67,7 +67,7 @@ AutoSei is a cutting-edge DeFi portfolio management platform built specifically 
 <tr>
 <td><strong>AI & Data</strong></td>
 <td>
-  <img src="https://img.shields.io/badge/Google_Gemini-2.5_Pro-4285F4?style=flat&logo=google" alt="Google Gemini">
+  <img src="https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=flat&logo=google" alt="Google Gemini">
   <img src="https://img.shields.io/badge/React_Query-5.75-FF4154?style=flat" alt="React Query">
   <img src="https://img.shields.io/badge/Axios-1.9-5A29E4?style=flat" alt="Axios">
 </td>
@@ -235,6 +235,34 @@ Connect your MetaMask or compatible Web3 wallet to the Sei EVM testnet.
 - Compare yield farming opportunities across protocols
 - Access professional-grade trading algorithms
 - Follow successful traders and copy their strategies
+
+---
+
+## 📖 Documentation
+
+### API References
+- **Smart Contract API**: Complete documentation for portfolio management contracts
+- **Trading Bot API**: Interfaces for bot configuration and monitoring
+- **Whale Tracker API**: Real-time whale activity monitoring endpoints
+- **AI Assistant API**: Integration guide for conversational AI features
+
+### Integration Guides
+- **Wallet Integration**: Step-by-step guide for connecting Web3 wallets
+- **Custom Strategies**: How to build and deploy custom trading strategies  
+- **Risk Management**: Best practices for portfolio protection and risk assessment
+- **Performance Metrics**: Understanding and interpreting analytics dashboards
+
+### Technical Documentation
+- **Smart Contract Architecture**: Detailed contract specifications and security features
+- **AI System Design**: Understanding the multi-layered AI architecture
+- **Data Sources**: Integration with SeiTrace API and market data providers
+- **Security Protocols**: Comprehensive security measures and audit procedures
+
+### Developer Resources
+- **SDK Documentation**: JavaScript/TypeScript SDK for AutoSei integration
+- **API Endpoints**: REST API documentation with examples
+- **Webhook Integration**: Real-time event notifications setup
+- **Testing Environment**: Guide to using testnet and mock services
 
 ---
 
