@@ -20,6 +20,9 @@
 
 ## 🌟 Overview
 
+![Cute Bird Flapping Animation](https://github.com/user-attachments/assets/cd0f0dba-1b12-4437-8053-a380836cfe84)
+
+
 AutoSei is a cutting-edge DeFi portfolio management platform built specifically for the Sei EVM network. It combines advanced artificial intelligence, intelligent trading bots, real-time whale tracking, and intuitive user experience to democratize sophisticated portfolio management strategies for DeFi investors.
 
 **AutoSei transforms complex DeFi operations into simple conversations**, enabling users to manage portfolios, deploy trading bots, track whale activities, and optimize yields through natural language interactions with AI.
