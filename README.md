@@ -346,7 +346,7 @@ AutoSei employs a sophisticated multi-layered AI system:
 
 ## 🗺️ Roadmap
 
-### 🎯 Q1 2025 - Foundation ✅ COMPLETED
+### 🎯 Q3 2025 - Foundation ✅ COMPLETED
 - [x] MVP Development with Professional UI/UX
 - [x] AI Integration (Google Gemini 2.5 Flash)
 - [x] Sei EVM Testnet Deployment
@@ -356,27 +356,37 @@ AutoSei employs a sophisticated multi-layered AI system:
 - [x] **AI-Powered Risk Analysis** and Market Intelligence
 - [x] **Real-time SeiTrace API Integration**
 
-### 🚀 Q2 2025 - Enhancement
+### 🚀 Q4 2025 - Enhancement & Optimization
 - [ ] Advanced Trading Bot Strategies (Social Trading, Copy Trading)
 - [ ] Enhanced Data Visualization and Analytics Dashboard
 - [ ] Additional DeFi Protocol Integrations (Yield Farming Optimization)
 - [ ] Mobile App Development
 - [ ] **Strategy Marketplace** with Community Features
-- [ ] Community Features
+- [ ] Performance Optimization and Bug Fixes
 
-### 🌟 Q3 2025 - Expansion
+### 🌟 Q1 2026 - Expansion & Scaling
 - [ ] Mainnet Deployment
-- [ ] Multi-chain Support
+- [ ] Multi-chain Support (Ethereum, BSC, Polygon)
 - [ ] Institutional Features
 - [ ] Advanced Analytics Dashboard
 - [ ] API for Third-party Integrations
+- [ ] Community DAO Governance Setup
 
-### 🏆 Q4 2025 - Enterprise
+### 🏆 Q2 2026 - Enterprise & Global Reach
 - [ ] DAO Governance Implementation
 - [ ] Enterprise-grade Features
-- [ ] Global Expansion
+- [ ] Global Expansion & Localization
 - [ ] Traditional Finance Integration
 - [ ] Regulatory Compliance Tools
+- [ ] Advanced Security Audits
+
+### 🌍 Q 2026 - Innovation & Future Tech
+- [ ] AI Model Training on Historical Data
+- [ ] Cross-chain Bridge Integration
+- [ ] Advanced DeFi Protocols Support
+- [ ] Machine Learning Portfolio Optimization
+- [ ] Institutional Investment Tools
+- [ ] Next-generation Trading Algorithms
 
 ---
 
